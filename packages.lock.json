@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "dependencies": {
+    ".NETStandard,Version=v2.1": {
+      "Silksong.GameLibs": {
+        "type": "Direct",
+        "requested": "[*-*, )",
+        "resolved": "1.2.0-silksong1.0.30000",
+        "contentHash": "2JPRsmFO5dBwLeIHA3kLlEYtu4BQ0Swdp3E4+J35IQGEujW3npMPot83BvY9wd3N7/Ycy2IfWilWC7fx6Sa3bg=="
+      },
+      "UnityEngine.Modules": {
+        "type": "Direct",
+        "requested": "[6000.0.50, )",
+        "resolved": "6000.0.50",
+        "contentHash": "hEFz1r4NGzeYXPY2yPh+/btcnwVB6EnEeRjDMCVNi19PD7VvRMvJeu46x1dNH9jYkT0B/ZXuyMBYiuI7YlRnKw=="
+      }
+    }
+  }
+}

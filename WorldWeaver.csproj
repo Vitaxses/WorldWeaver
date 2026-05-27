@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="SilksongPath.props" Condition="Exists('SilksongPath.props')" />
+  <PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+
+    <Version>0.1.0</Version>
+    <AssemblyTitle>WorldWeaver</AssemblyTitle>
+		
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisMode>recommended</AnalysisMode>
+		<NoWarn>$(NoWarn);MSB3270</NoWarn>
+
+		<RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
+		<RestoreLockedMode Condition="'$(CI)' == 'true'">True</RestoreLockedMode>
+
+    <!-- dotnet new silksongpath -->
+    <ManagedFolder>$(SilksongFolder)\Hollow Knight Silksong_Data\Managed\</ManagedFolder>
+	</PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="UnityEngine.Modules" Version="6000.0.50" IncludeAssets="compile" />
+    <PackageReference Include="Silksong.GameLibs" Version="*-*" PrivateAssets="all" />
+
+    <Reference Include="UnityEditor">
+      <HintPath>$(UnityEditorManagedFolder)/UnityEditor.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>
+
+
+<!-- Backup:
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(ManagedFolder)Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <Reference Include="UnityEngine">
+      <HintPath>$(ManagedFolder)UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(ManagedFolder)UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <Reference Include="UnityEngine.Physics2DModule">
+      <HintPath>$(ManagedFolder)UnityEngine.Physics2DModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedFolder)UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference> 
+-->
