@@ -6,6 +6,9 @@ updates:
       - dependency-name: BepInEx.Core
       - dependency-name: HarmonyX
       - dependency-name: UnityEngine.Modules
+      - dependency-name: Microsoft.Unity.Analyzers
+      - dependency-name: Harmonize
+      - dependency-name: Hamunii.BepInEx.AutoPlugin
     schedule:
       interval: daily
     groups:
