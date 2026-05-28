@@ -3,7 +3,6 @@ Utility/Library mod.
 
 ## For Developers
 
-TODO
 -# badly written code, please dont look at it ;D
 
 
