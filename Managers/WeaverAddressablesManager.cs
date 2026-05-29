@@ -10,55 +10,42 @@ public static class WeaverAddressablesManager
     private static readonly Dictionary<string, string> rootMap = [];
     private static readonly List<string> catalogQueue = [];
 
-    private static bool registeredCatalogs = false;
+    private static bool _registeredCatalogs = false;
+    public static bool RegisteredCatalogs => _registeredCatalogs;
 
     internal static void Init()
     {
         Plugin.Instance.StartCoroutine(RegisterCatalogs());
-        InjectAddressablesIds();
     }
 
     private static IEnumerator RegisterCatalogs()
     {
         if (catalogQueue.Count == 0)
+        {
+            _registeredCatalogs = true;
             yield break;
+        }
 
-        Plugin.Instance.Logger.LogDebug($"Registering {catalogQueue.Count} catalog(s)");
+        Plugin.Instance.Logger.LogDebug($"[Adressables] Registering {catalogQueue.Count} catalog(s)");
 
         yield return Addressables.InitializeAsync();
 
-        foreach (var relative in catalogQueue)
+        foreach (var catalogPath in catalogQueue)
         {
-            string normalized = relative.Replace("\\", "/");
+            var handle = Addressables.LoadContentCatalogAsync(new Uri(catalogPath).AbsoluteUri);
+            yield return handle;
 
-            int slash = normalized.IndexOf('/');
-            if (slash <= 0)
+            if (handle.Status != AsyncOperationStatus.Succeeded)
             {
-                Plugin.Instance.Logger.LogWarning($"Invalid catalog path: {relative}");
+                Plugin.Instance.Logger.LogError($"[Adressables] Catalog failed to load: {catalogPath} ({handle.Status})");
                 continue;
             }
 
-            string root = normalized.Substring(0, slash + 1);
-
-            string pluginFolder = Path.GetFullPath(Path.Combine(Paths.PluginPath, root));
-
-            RegisterRoot(root, pluginFolder);
-
-            string fullPath = Path.GetFullPath(Path.Combine(Paths.PluginPath, normalized));
-            string uri = new Uri(fullPath).AbsoluteUri;
-
-            Plugin.Instance.Logger.LogDebug($"Loading catalog: {normalized}");
-
-            var handle = Addressables.LoadContentCatalogAsync(uri);
-            yield return handle;
-
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-                Plugin.Instance.Logger.LogDebug($"Catalog loaded: {normalized}");
-            else
-                Plugin.Instance.Logger.LogWarning($"Failed to load catalog: {normalized}");
+            Plugin.Instance.Logger.LogDebug($"[Adressables] Catalog loaded: {catalogPath}");
         }
 
-        registeredCatalogs = true;
+        InjectAddressablesIds();
+        _registeredCatalogs = true;
     }
 
     private static void InjectAddressablesIds()
@@ -68,59 +55,62 @@ public static class WeaverAddressablesManager
         Addressables.InternalIdTransformFunc = location =>
         {
             string id = previous?.Invoke(location) ?? location.InternalId;
-            string normalized = id.Replace("\\", "/");
 
+            string normalized = id.Replace("\\", "/");
             foreach (var kvp in rootMap)
             {
-                string root = kvp.Key;
-                string basePath = kvp.Value;
+                var root = kvp.Key;
+                var pluginPath = kvp.Value;
 
-                if (!normalized.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+                int index = normalized.IndexOf(root, StringComparison.OrdinalIgnoreCase);
+
+                if (index < 0)
                     continue;
 
-                string relative = normalized.Substring(root.Length);
+                string relativePath = normalized[(index + root.Length)..];
+                string newId = Path.Combine(pluginPath, relativePath);
+                newId = newId.Replace("\\", "/");
 
-                string newId = Path.Combine(basePath, relative).Replace("\\", "/");
-
-                #if DEBUG
-                Plugin.Instance.Logger.LogDebug($"Rewrote Addressables path: {id} -> {newId}");
-                #endif
-
+                Plugin.Instance.Logger.LogDebug($"[Adressables] Rewrote Addressables path: {id} -> {newId}");
                 return newId;
             }
-
+            
             return id;
         };
     }
 
-    public static void RegisterRoot(string root, string pluginFolder)
+    public static void RegisterAddressablesRoot(string rootId, string pluginFolder)
     {
-        if (string.IsNullOrWhiteSpace(root))
+        if (string.IsNullOrWhiteSpace(rootId))
             return;
 
-        root = root.Replace("\\", "/");
+        rootId = rootId.Replace("\\", "/");
 
-        if (!root.EndsWith("/"))
-            root += "/";
+        if (!rootId.EndsWith('/'))
+            rootId += "/";
 
         pluginFolder = pluginFolder.Replace("\\", "/");
 
-        if (rootMap.ContainsKey(root))
+        foreach (var kvp in rootMap)
         {
-            Plugin.Instance.Logger.LogWarning($"Addressables root already registered: {root}");
-            return;
+            var existing = kvp.Key;
+
+            if (existing.Contains(rootId, StringComparison.OrdinalIgnoreCase) || rootId.Contains(existing, StringComparison.OrdinalIgnoreCase))
+            {
+                Plugin.Instance.Logger.LogError($"[Adressables] Ambiguous root registration rejected.\n" + $"[Adressables] New: {rootId}\nExisting: {existing}");
+                return;
+            }
         }
 
-        rootMap[root] = pluginFolder;
-
-        Plugin.Instance.Logger.LogDebug($"Registered Addressables root: {root} -> {pluginFolder}");
+        rootMap[rootId] = pluginFolder;
+        Plugin.Instance.Logger.LogDebug($"[Adressables] Registered Addressables root: {rootId} -> {pluginFolder}");
     }
 
     public static void RegisterAddressablesCatalog(string catalogPath)
     {
-        if (registeredCatalogs)
+        if (_registeredCatalogs)
         {
-            Plugin.Instance.Logger.LogWarning($"Catalog ignored (already loaded): {catalogPath}");
+            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog ignored (already loaded catalogs): {catalogPath}");
             return;
         }
 
@@ -129,21 +119,13 @@ public static class WeaverAddressablesManager
 
         catalogPath = catalogPath.Replace("\\", "/");
 
-        if (Path.IsPathRooted(catalogPath))
+        if (!Path.IsPathRooted(catalogPath))
         {
-            string pluginsPath = Path.GetFullPath(Paths.PluginPath).Replace("\\", "/");
-            string full = Path.GetFullPath(catalogPath).Replace("\\", "/");
-
-            if (!full.StartsWith(pluginsPath, StringComparison.OrdinalIgnoreCase))
-            {
-                Plugin.Instance.Logger.LogWarning($"Catalog outside plugins folder: {catalogPath}");
-                return;
-            }
-
-            catalogPath = Path.GetRelativePath(pluginsPath, full).Replace("\\", "/");
+            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog path is not rooted ({catalogPath})");
+            return;
         }
         
-        Plugin.Instance.Logger.LogDebug($"Catalog added to registration queue ({catalogPath})");
+        Plugin.Instance.Logger.LogDebug($"[Adressables] Catalog added to registration queue ({catalogPath})");
         catalogQueue.Add(catalogPath);
     }
 }
