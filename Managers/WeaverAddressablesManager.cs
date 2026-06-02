@@ -48,6 +48,7 @@ public static class WeaverAddressablesManager
         _registeredCatalogs = true;
     }
 
+    // Hopefully theres a better fix than this
     private static void InjectAddressablesIds()
     {
         var previous = Addressables.InternalIdTransformFunc;
@@ -79,7 +80,7 @@ public static class WeaverAddressablesManager
         };
     }
 
-    public static void RegisterAddressablesRoot(string rootId, string pluginFolder)
+    private static void RegisterAddressablesRoot(string rootId, string pluginFolder)
     {
         if (string.IsNullOrWhiteSpace(rootId))
             return;
@@ -106,7 +107,7 @@ public static class WeaverAddressablesManager
         Plugin.Instance.Logger.LogDebug($"[Adressables] Registered Addressables root: {rootId} -> {pluginFolder}");
     }
 
-    public static void RegisterAddressablesCatalog(string catalogPath)
+    public static void RegisterAddressablesCatalog(string catalogPath, string rootId, string pluginFolder)
     {
         if (_registeredCatalogs)
         {
@@ -126,6 +127,7 @@ public static class WeaverAddressablesManager
         }
         
         Plugin.Instance.Logger.LogDebug($"[Adressables] Catalog added to registration queue ({catalogPath})");
+        RegisterAddressablesRoot(rootId, pluginFolder);
         catalogQueue.Add(catalogPath);
     }
 }
