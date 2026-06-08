@@ -6,6 +6,8 @@ public static class WeaverDataManager
 {
     private static readonly List<WeaverSceneDataHandler> registeredDataHandlers = new();
 
+    private static Action<GameManager, bool> OnTimePasses = null!;
+
     internal static void Init()
     {
     }
@@ -35,6 +37,19 @@ public static class WeaverDataManager
         Plugin.Instance.Logger.LogInfo($"Added WeaverDataHandler ({dataHandler.ModIdentifier})");
 
         return true;
+    }
+
+    public static void AddToOnTimePasses(Action<GameManager, bool> action)
+    {
+        if (action == null)
+            return;
+
+        OnTimePasses += action;
+    }
+
+    public static void OnTimePassesMod(GameManager gm, bool isElsewhere)
+    {
+        OnTimePasses?.Invoke(gm, isElsewhere);
     }
 
     public static void ResetSemiPersistentItems()

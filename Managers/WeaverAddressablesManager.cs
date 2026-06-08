@@ -131,3 +131,4 @@ public static class WeaverAddressablesManager
         catalogQueue.Add(catalogPath);
     }
 }
+// TODO: Add logging that doesnt show full game path/catalog path
