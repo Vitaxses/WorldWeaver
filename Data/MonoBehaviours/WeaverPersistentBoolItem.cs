@@ -24,6 +24,7 @@ public class WeaverPersistentBoolItem : PersistentBoolItem
             return;
         }
 
+        Plugin.Instance.Logger.LogDebug($"Saving PersistentBoolItem: Id={newItemData.ID}, Scene={newItemData.SceneName}, Value={newItemData.Value}, ModId={ModId}");
         sceneData.SetValue(newItemData);
     }
 

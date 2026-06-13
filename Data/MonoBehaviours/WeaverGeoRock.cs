@@ -39,6 +39,7 @@ public class WeaverGeoRock : GeoRock
             return;
         }
         
+        Plugin.Instance.Logger.LogDebug($"Saving GeoRockState: Id={geoRockData.id}, Scene={geoRockData.sceneName}, HitsLeft={geoRockData.hitsLeft}, ModId={ModId}");
         sceneData.SaveMyState(geoRockData);
     }
 
