@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine.SceneManagement;
@@ -39,12 +40,24 @@ public static class WeaverTransitionManager
                 continue;
 
             scene.transitionsDict = new();
+            //var s = $"Scenename: {scene.sceneName} |" + " TransitionData: {" + $"Count: {scene.transitions.Length}";
 
-            foreach (var transitionData in scene.transitions)
+            for (int i = 0; i < scene.transitions.Length; i++)
             {
-                if (!string.IsNullOrEmpty(transitionData.gateName))
-                    scene.transitionsDict[transitionData.gateName] = transitionData;
+                var tData = scene.transitions[i];
+                if (!string.IsNullOrEmpty(tData.gateName))
+                {
+                    scene.transitionsDict[tData.gateName] = tData;
+                    //s += $", {i + 1}: " + "{" + $"destinationScene: {tData.destinationScene}, gateName: {tData.gateName}, destinationGate: {tData.destinationGate}" + "}";
+                }
             }
+            //Plugin.Instance.Logger.LogDebug(s + " }");
+
+            if (transitionOverride.scenesDict.ContainsKey(scene.sceneName))
+            {
+                Plugin.Instance.Logger.LogWarning($"Duplicate transition group for scene '{scene.sceneName}'. Overwriting previous group.");
+            }
+
 
             transitionOverride.scenesDict[scene.sceneName] = scene;
         }
