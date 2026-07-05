@@ -46,6 +46,7 @@ public static class WeaverAddressablesManager
 
         InjectAddressablesIds();
         _registeredCatalogs = true;
+        WeaverMapManager.LoadSelectedMaps();
     }
 
     // Hopefully theres a better fix than this
