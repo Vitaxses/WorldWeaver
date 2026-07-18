@@ -1,5 +1,7 @@
 using System.Collections;
 using System.IO;
+using System.Runtime.InteropServices;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
@@ -76,7 +78,7 @@ public static class WeaverAddressablesManager
                 Plugin.Instance.Logger.LogDebug($"[Adressables] Rewrote Addressables path: {id} -> {newId}");
                 return newId;
             }
-            
+
             return id;
         };
     }
@@ -119,17 +121,40 @@ public static class WeaverAddressablesManager
         if (string.IsNullOrWhiteSpace(catalogPath))
             return;
 
+        //I pray this'll make this stable on other platforms
         catalogPath = catalogPath.Replace("\\", "/");
+
+        string catalogFolder = Path.GetDirectoryName(catalogPath)!;
+
+        catalogPath = Path.Combine(catalogFolder, GetCatalogName())
+            .Replace("\\", "/");
 
         if (!Path.IsPathRooted(catalogPath))
         {
             Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog path is not rooted ({catalogPath})");
             return;
         }
-        
+
         Plugin.Instance.Logger.LogDebug($"[Adressables] Catalog added to registration queue ({catalogPath})");
         RegisterAddressablesRoot(rootId, pluginFolder);
         catalogQueue.Add(catalogPath);
+    }
+
+    private static string GetCatalogName()
+    {
+        string catalog = Application.platform switch
+        {
+            RuntimePlatform.WindowsPlayer => "catalog-StandaloneWindows64.bin",
+            RuntimePlatform.LinuxPlayer => "catalog-StandaloneLinux64.bin",
+            RuntimePlatform.OSXPlayer => "catalog-StandaloneOSX.bin",
+            _ => throw new PlatformNotSupportedException(
+                $"Unsupported platform: {Application.platform}")
+        };
+
+        Plugin.Instance.Logger.LogDebug(
+            $"[Addressables] Platform: {Application.platform}, using {catalog}");
+
+        return catalog;
     }
 }
 // TODO: Add logging that doesnt show full game path/catalog path
