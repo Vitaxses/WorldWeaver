@@ -1,5 +1,6 @@
 using System.Collections;
 using System.IO;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
@@ -50,6 +51,7 @@ public static class WeaverAddressablesManager
     }
 
     // Hopefully theres a better fix than this
+    // Not even sure if we need this anymore
     private static void InjectAddressablesIds()
     {
         var previous = Addressables.InternalIdTransformFunc;
@@ -108,16 +110,72 @@ public static class WeaverAddressablesManager
         Plugin.Instance.Logger.LogDebug($"[Adressables] Registered Addressables root: {rootId} -> {pluginFolder}");
     }
 
-    public static void RegisterAddressablesCatalog(string catalogPath, string rootId, string pluginFolder)
+    public static void RegisterAddressablesCatalog(string windows64CatalogPath, string OSXCatalogPath, string linux64CatalogPath, string rootId, string pluginFolder)
     {
         if (_registeredCatalogs)
         {
-            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog ignored (already loaded catalogs): {catalogPath}");
+            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog ignored (already loaded catalogs)");
             return;
         }
 
+        string catalogPath = Application.platform switch
+        {
+            RuntimePlatform.WindowsPlayer => windows64CatalogPath,
+            RuntimePlatform.OSXPlayer => OSXCatalogPath,
+            RuntimePlatform.LinuxPlayer => linux64CatalogPath,
+            _ => ""
+        };
+
         if (string.IsNullOrWhiteSpace(catalogPath))
             return;
+
+        catalogPath = catalogPath.Replace("\\", "/");
+
+        if (!File.Exists(catalogPath))
+        {
+            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog path invalid ({catalogPath})");
+            return;
+        }
+
+        if (!Path.IsPathRooted(catalogPath))
+        {
+            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog path is not rooted ({catalogPath})");
+            return;
+        }
+        Plugin.Instance.Logger.LogDebug($"[Adressables] Catalog added to registration queue ({catalogPath})");
+        RegisterAddressablesRoot(rootId, pluginFolder);
+        catalogQueue.Add(catalogPath);
+    }
+
+    public static void RegisterAddressablesCatalog(string catalogFolderPath, string rootId, string pluginFolder)
+    {
+        if (_registeredCatalogs)
+        {
+            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog ignored (already loaded catalogs)");
+            return;
+        }
+
+        if (!Directory.Exists(catalogFolderPath))
+        {
+            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog folder path invalid ({catalogFolderPath})");
+            return;
+        }
+
+        var catalog = Application.platform switch
+        {
+            RuntimePlatform.WindowsPlayer => "catalog-StandaloneWindows64.bin",
+            RuntimePlatform.LinuxPlayer => "catalog-StandaloneLinux64.bin",
+            RuntimePlatform.OSXPlayer => "catalog-StandaloneOSX.bin",
+            _ => throw new PlatformNotSupportedException($"Unsupported platform: {Application.platform}")
+        };
+
+        var catalogPath = Path.Combine(catalogFolderPath, catalog);
+
+        if (!File.Exists(catalogPath))
+        {
+            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog path invalid ({catalogPath})");
+            return;
+        }
 
         catalogPath = catalogPath.Replace("\\", "/");
 
@@ -126,7 +184,7 @@ public static class WeaverAddressablesManager
             Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog path is not rooted ({catalogPath})");
             return;
         }
-        
+
         Plugin.Instance.Logger.LogDebug($"[Adressables] Catalog added to registration queue ({catalogPath})");
         RegisterAddressablesRoot(rootId, pluginFolder);
         catalogQueue.Add(catalogPath);
