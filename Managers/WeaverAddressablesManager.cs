@@ -27,7 +27,7 @@ public static class WeaverAddressablesManager
             yield break;
         }
 
-        Plugin.Instance.Logger.LogDebug($"[Adressables] Registering {catalogQueue.Count} catalog(s)");
+        Plugin.Instance.Logger.LogDebug($"[Addressables] Registering {catalogQueue.Count} catalog(s)");
 
         yield return Addressables.InitializeAsync();
 
@@ -38,11 +38,11 @@ public static class WeaverAddressablesManager
 
             if (handle.Status != AsyncOperationStatus.Succeeded)
             {
-                Plugin.Instance.Logger.LogError($"[Adressables] Catalog failed to load: {catalogPath} ({handle.Status})");
+                Plugin.Instance.Logger.LogError($"[Addressables] Catalog failed to load: {catalogPath} ({handle.Status})");
                 continue;
             }
 
-            Plugin.Instance.Logger.LogDebug($"[Adressables] Catalog loaded: {catalogPath}");
+            Plugin.Instance.Logger.LogDebug($"[Addressables] Catalog loaded: {catalogPath}");
         }
 
         InjectAddressablesIds();
@@ -75,7 +75,7 @@ public static class WeaverAddressablesManager
                 string newId = Path.Combine(pluginPath, relativePath);
                 newId = newId.Replace("\\", "/");
 
-                Plugin.Instance.Logger.LogDebug($"[Adressables] Rewrote Addressables path: {id} -> {newId}");
+                Plugin.Instance.Logger.LogDebug($"[Addressables] Rewrote Addressables path: {id} -> {newId}");
                 return newId;
             }
             
@@ -101,20 +101,20 @@ public static class WeaverAddressablesManager
 
             if (existing.Contains(rootId, StringComparison.OrdinalIgnoreCase) || rootId.Contains(existing, StringComparison.OrdinalIgnoreCase))
             {
-                Plugin.Instance.Logger.LogError($"[Adressables] Ambiguous root registration rejected.\n" + $"[Adressables] New: {rootId}\nExisting: {existing}");
+                Plugin.Instance.Logger.LogError($"[Addressables] Ambiguous root registration rejected.\n" + $"[Addressables] New: {rootId}\nExisting: {existing}");
                 return;
             }
         }
 
         rootMap[rootId] = pluginFolder;
-        Plugin.Instance.Logger.LogDebug($"[Adressables] Registered Addressables root: {rootId} -> {pluginFolder}");
+        Plugin.Instance.Logger.LogDebug($"[Addressables] Registered Addressables root: {rootId} -> {pluginFolder}");
     }
 
     public static void RegisterAddressablesCatalog(string windows64CatalogPath, string OSXCatalogPath, string linux64CatalogPath, string rootId, string pluginFolder)
     {
         if (_registeredCatalogs)
         {
-            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog ignored (already loaded catalogs)");
+            Plugin.Instance.Logger.LogWarning($"[Addressables] Catalog ignored (already loaded catalogs)");
             return;
         }
 
@@ -123,7 +123,7 @@ public static class WeaverAddressablesManager
             RuntimePlatform.WindowsPlayer => windows64CatalogPath,
             RuntimePlatform.OSXPlayer => OSXCatalogPath,
             RuntimePlatform.LinuxPlayer => linux64CatalogPath,
-            _ => ""
+            _ => throw new PlatformNotSupportedException($"Unsupported platform: {Application.platform}")
         };
 
         if (string.IsNullOrWhiteSpace(catalogPath))
@@ -133,16 +133,16 @@ public static class WeaverAddressablesManager
 
         if (!File.Exists(catalogPath))
         {
-            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog path invalid ({catalogPath})");
+            Plugin.Instance.Logger.LogWarning($"[Addressables] Catalog path invalid ({catalogPath})");
             return;
         }
 
         if (!Path.IsPathRooted(catalogPath))
         {
-            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog path is not rooted ({catalogPath})");
+            Plugin.Instance.Logger.LogWarning($"[Addressables] Catalog path is not rooted ({catalogPath})");
             return;
         }
-        Plugin.Instance.Logger.LogDebug($"[Adressables] Catalog added to registration queue ({catalogPath})");
+        Plugin.Instance.Logger.LogDebug($"[Addressables] Catalog added to registration queue ({catalogPath})");
         RegisterAddressablesRoot(rootId, pluginFolder);
         catalogQueue.Add(catalogPath);
     }
@@ -151,13 +151,13 @@ public static class WeaverAddressablesManager
     {
         if (_registeredCatalogs)
         {
-            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog ignored (already loaded catalogs)");
+            Plugin.Instance.Logger.LogWarning($"[Addressables] Catalog ignored (already loaded catalogs)");
             return;
         }
 
         if (!Directory.Exists(catalogFolderPath))
         {
-            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog folder path invalid ({catalogFolderPath})");
+            Plugin.Instance.Logger.LogWarning($"[Addressables] Catalog folder path invalid ({catalogFolderPath})");
             return;
         }
 
@@ -169,11 +169,12 @@ public static class WeaverAddressablesManager
             _ => throw new PlatformNotSupportedException($"Unsupported platform: {Application.platform}")
         };
 
+
         var catalogPath = Path.Combine(catalogFolderPath, catalog);
 
         if (!File.Exists(catalogPath))
         {
-            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog path invalid ({catalogPath})");
+            Plugin.Instance.Logger.LogWarning($"[Addressables] Catalog path invalid ({catalogPath})");
             return;
         }
 
@@ -181,11 +182,11 @@ public static class WeaverAddressablesManager
 
         if (!Path.IsPathRooted(catalogPath))
         {
-            Plugin.Instance.Logger.LogWarning($"[Adressables] Catalog path is not rooted ({catalogPath})");
+            Plugin.Instance.Logger.LogWarning($"[Addressables] Catalog path is not rooted ({catalogPath})");
             return;
         }
 
-        Plugin.Instance.Logger.LogDebug($"[Adressables] Catalog added to registration queue ({catalogPath})");
+        Plugin.Instance.Logger.LogDebug($"[Addressables] Catalog added to registration queue ({catalogPath})");
         RegisterAddressablesRoot(rootId, pluginFolder);
         catalogQueue.Add(catalogPath);
     }
