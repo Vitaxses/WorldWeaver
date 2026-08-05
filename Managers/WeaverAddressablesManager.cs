@@ -8,7 +8,7 @@ namespace WorldWeaver.Managers;
 
 public static class WeaverAddressablesManager
 {
-    private static readonly Dictionary<string, string> rootMap = [];
+    private static readonly Dictionary<string, string> loadPathMap = [];
     private static readonly List<string> catalogQueue = [];
 
     private static bool _registeredCatalogs = false;
@@ -61,17 +61,17 @@ public static class WeaverAddressablesManager
             string id = previous?.Invoke(location) ?? location.InternalId;
 
             string normalized = id.Replace("\\", "/");
-            foreach (var kvp in rootMap)
+            foreach (var kvp in loadPathMap)
             {
-                var root = kvp.Key;
+                var catalogLoadPath = kvp.Key;
                 var pluginPath = kvp.Value;
 
-                int index = normalized.IndexOf(root, StringComparison.OrdinalIgnoreCase);
+                int index = normalized.IndexOf(catalogLoadPath, StringComparison.OrdinalIgnoreCase);
 
                 if (index < 0)
                     continue;
 
-                string relativePath = normalized[(index + root.Length)..];
+                string relativePath = normalized[(index + catalogLoadPath.Length)..];
                 string newId = Path.Combine(pluginPath, relativePath);
                 newId = newId.Replace("\\", "/");
 
@@ -83,34 +83,34 @@ public static class WeaverAddressablesManager
         };
     }
 
-    private static void RegisterAddressablesRoot(string rootId, string pluginFolder)
+    private static void RegisterCatalogLoadPath(string loadPath, string pluginFolder)
     {
-        if (string.IsNullOrWhiteSpace(rootId))
+        if (string.IsNullOrWhiteSpace(loadPath))
             return;
 
-        rootId = rootId.Replace("\\", "/");
+        loadPath = loadPath.Replace("\\", "/");
 
-        if (!rootId.EndsWith('/'))
-            rootId += "/";
+        if (!loadPath.EndsWith('/'))
+            loadPath += "/";
 
         pluginFolder = pluginFolder.Replace("\\", "/");
 
-        foreach (var kvp in rootMap)
+        foreach (var kvp in loadPathMap)
         {
             var existing = kvp.Key;
 
-            if (existing.Contains(rootId, StringComparison.OrdinalIgnoreCase) || rootId.Contains(existing, StringComparison.OrdinalIgnoreCase))
+            if (existing.Contains(loadPath, StringComparison.OrdinalIgnoreCase) || loadPath.Contains(existing, StringComparison.OrdinalIgnoreCase))
             {
-                Plugin.Instance.Logger.LogError($"[Addressables] Ambiguous root registration rejected.\n" + $"[Addressables] New: {rootId}\nExisting: {existing}");
+                Plugin.Instance.Logger.LogError($"[Addressables] Ambiguous catalog load path.\n" + $"[Addressables] New: {loadPath}\nExisting: {existing}");
                 return;
             }
         }
 
-        rootMap[rootId] = pluginFolder;
-        Plugin.Instance.Logger.LogDebug($"[Addressables] Registered Addressables root: {rootId} -> {pluginFolder}");
+        loadPathMap[loadPath] = pluginFolder;
+        Plugin.Instance.Logger.LogDebug($"[Addressables] Added catalog load path: {loadPath} -> {pluginFolder}");
     }
 
-    public static void RegisterAddressablesCatalog(string windows64CatalogPath, string OSXCatalogPath, string linux64CatalogPath, string rootId, string pluginFolder)
+    public static void RegisterAddressablesCatalog(string windows64CatalogPath, string OSXCatalogPath, string linux64CatalogPath, string catalogLoadPath, string pluginFolder)
     {
         if (_registeredCatalogs)
         {
@@ -143,11 +143,11 @@ public static class WeaverAddressablesManager
             return;
         }
         Plugin.Instance.Logger.LogDebug($"[Addressables] Catalog added to registration queue ({catalogPath})");
-        RegisterAddressablesRoot(rootId, pluginFolder);
+        RegisterCatalogLoadPath(catalogLoadPath, pluginFolder);
         catalogQueue.Add(catalogPath);
     }
 
-    public static void RegisterAddressablesCatalog(string catalogFolderPath, string rootId, string pluginFolder)
+    public static void RegisterAddressablesCatalog(string catalogFolderPath, string catalogLoadPath, string pluginFolder)
     {
         if (_registeredCatalogs)
         {
@@ -169,7 +169,6 @@ public static class WeaverAddressablesManager
             _ => throw new PlatformNotSupportedException($"Unsupported platform: {Application.platform}")
         };
 
-
         var catalogPath = Path.Combine(catalogFolderPath, catalog);
 
         if (!File.Exists(catalogPath))
@@ -187,7 +186,7 @@ public static class WeaverAddressablesManager
         }
 
         Plugin.Instance.Logger.LogDebug($"[Addressables] Catalog added to registration queue ({catalogPath})");
-        RegisterAddressablesRoot(rootId, pluginFolder);
+        RegisterCatalogLoadPath(catalogLoadPath, pluginFolder);
         catalogQueue.Add(catalogPath);
     }
 }
