@@ -1,3 +1,4 @@
+using tk2dRuntime.TileMap;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
@@ -56,7 +57,7 @@ public static class WeaverTilemapManager
 
             combinedBounds = combinedBounds == null ? bounds : Combine(combinedBounds.Value, bounds);
 
-            tm.ForceBuild(); // Fix tilemap disappearing when reloading a scene
+            RenderMeshBuilder.Build(tm, false, true); // Fix tilemap disappearing when reloading a scene
         }
 
         if (combinedBounds == null)
