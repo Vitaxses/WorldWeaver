@@ -3,9 +3,8 @@ using WorldWeaver.Managers;
 
 namespace WorldWeaver.Patches;
 
-// Ensure correct size before borders
-[HarmonyPatch(typeof(CustomSceneManager), nameof(CustomSceneManager.DrawBlackBorders))]
-internal static class DrawBlackBordersPatch
+[HarmonyPatch(typeof(GameManager), nameof(GameManager.RefreshTilemapInfo))]
+internal static class RefreshTilemapInfoPatch
 {
     [HarmonyPrefix]
     static void DrawBlackBorders()

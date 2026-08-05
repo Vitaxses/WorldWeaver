@@ -55,6 +55,8 @@ public static class WeaverTilemapManager
             bounds.SetMinMax(tm.transform.position, tm.transform.position + new Vector3(tm.width, tm.height, 0f));
 
             combinedBounds = combinedBounds == null ? bounds : Combine(combinedBounds.Value, bounds);
+
+            tm.ForceBuild(); // Fix tilemap disappearing when reloading a scene
         }
 
         if (combinedBounds == null)
