@@ -1,3 +1,4 @@
+using tk2dRuntime.TileMap;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
@@ -43,7 +44,7 @@ public static class WeaverTilemapManager
         Bounds? combinedBounds = null;
 
         var unityTilemaps = scene.GetRootGameObjects()
-            .SelectMany(go => go.GetComponentsInChildren<Tilemap>(true)).ToList();
+            .SelectMany(go => go.GetComponentsInChildren<Tilemap>(true));
 
         var tk2dMaps = scene.GetRootGameObjects()
             .SelectMany(go => go.GetComponentsInChildren<tk2dTileMap>(true))
@@ -76,6 +77,13 @@ public static class WeaverTilemapManager
             bounds.SetMinMax(tm.transform.position, tm.transform.position + new Vector3(tm.width, tm.height, 0f));
 
             combinedBounds = combinedBounds == null ? bounds : Combine(combinedBounds.Value, bounds);
+
+            foreach (var layer in tm.Layers)
+                foreach (var chunk in layer.spriteChannel.chunks)
+                    if (chunk.gameObject != null && chunk.gameObject.activeSelf)
+                        chunk.Dirty = true;
+
+            RenderMeshBuilder.Build(tm, false, false); // Fix tilemap disappearing when reloading a scene
         }
 
         if (combinedBounds == null)
@@ -88,101 +96,9 @@ public static class WeaverTilemapManager
         GameManager.instance.sceneHeight = Mathf.RoundToInt(max.y - min.y);
     }
 
-    public static Bounds Combine(Bounds a, Bounds b)
+    private static Bounds Combine(Bounds a, Bounds b)
     {
         a.Encapsulate(b);
         return a;
-    }
-
-    public static void ConvertTk2dTilemaps()
-    {
-        var scene = SceneManager.GetActiveScene();
-
-        var unityTilemaps = scene.GetRootGameObjects()
-            .SelectMany(go => go.GetComponentsInChildren<Tilemap>(true)).ToList();
-
-        var tk2dMaps = scene.GetRootGameObjects()
-            .SelectMany(go => go.GetComponentsInChildren<tk2dTileMap>(true))
-            .Where(t => t.gameObject.name != "_TileMap (Not used.)").ToList();
-
-        if (unityTilemaps.Count != 1 || tk2dMaps.Count <= 0)
-            return;
-
-        Tilemap tilemap = unityTilemaps[0];
-        TileBase? unityTile = null;
-
-        foreach (var pos in tilemap.cellBounds.allPositionsWithin)
-        {
-            var tile = tilemap.GetTile(pos);
-
-            if (tile != null)
-            {
-                unityTile = tile;
-                break;
-            }
-        }
-
-        if (unityTile == null)
-        {
-            Plugin.Instance.Logger.LogWarning("Could not find any tile in unity tilemap");
-            return;
-        }
-
-        foreach (var tm in tk2dMaps)
-        {
-            HandleTk2dTilemap(tilemap, tm, unityTile);
-
-            UnityEngine.Object.Destroy(tm.renderData);
-            UnityEngine.Object.Destroy(tm.gameObject);
-        }
-
-        tilemap.RefreshAllTiles();
-    }
-
-    private static void HandleTk2dTilemap(Tilemap ut, tk2dTileMap tm, TileBase unityTile)
-    {
-        int partitionSizeX = tm.partitionSizeX;
-        int partitionSizeY = tm.partitionSizeY;
-        
-        for (int i = 0; i < tm.Layers.Length; i++)
-        {
-            var layer = tm.Layers[i];
-            var chunks = layer.spriteChannel.chunks;
-
-            for (int chunk = 0; chunk < chunks.Length; chunk++)
-            {
-                var spriteChunk = chunks[chunk];
-
-                if (spriteChunk != null && (spriteChunk.gameObject == null || !spriteChunk.gameObject.activeSelf))
-                {
-                    continue; // Skip disabled or deleted chunks
-                }
-
-                int chunkX = chunk % layer.numColumns;
-                int chunkY = chunk / layer.numColumns;
-
-                int startX = chunkX * partitionSizeX;
-                int startY = chunkY * partitionSizeY;
-
-                int endX = Mathf.Min(startX + partitionSizeX, tm.width);
-                int endY = Mathf.Min(startY + partitionSizeY, tm.height);
-
-                for (int x = startX; x < endX; x++)
-                {
-                    for (int y = startY; y < endY; y++)
-                    {
-                        int tileId = tm.GetTile(x, y, i);
-
-                        if (tileId < 0)
-                            continue;
-
-                        Vector3 worldPosition = tm.GetTilePosition(x, y);
-                        Vector3Int cell = ut.WorldToCell(worldPosition);
-
-                        ut.SetTile(cell, unityTile);
-                    }
-                }
-            }   
-        }
     }
 }

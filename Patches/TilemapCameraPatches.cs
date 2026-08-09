@@ -12,8 +12,9 @@ internal static class TilemapCameraPatches
         if (!WeaverTilemapManager.IsCustomTilemapScene())
             return true;
 
-        var gm = GameManager.instance;
-        if (gm == null) return true;
+        var gm = GameManager.SilentInstance;
+        if (gm == null) 
+            return true;
 
         float w = gm.sceneWidth;
         float h = gm.sceneHeight;
@@ -23,6 +24,7 @@ internal static class TilemapCameraPatches
 
         __instance.xLimit = w - 14.6f;
         __instance.yLimit = h - 8.3f;
+        
         return false;
     }
 }
