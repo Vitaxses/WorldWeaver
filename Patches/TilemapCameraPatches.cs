@@ -1,17 +1,15 @@
-using UnityEngine.SceneManagement;
 using WorldWeaver.Managers;
 
 namespace WorldWeaver.Patches;
 
-[HarmonyPatch(typeof(CameraController))]
+// Override tilemap sizing cleanly
+[HarmonyPatch(typeof(CameraController), nameof(CameraController.GetTilemapInfo))]
 internal static class TilemapCameraPatches
 {
-    // Override tilemap sizing cleanly
-    [HarmonyPatch(nameof(CameraController.GetTilemapInfo))]
     [HarmonyPrefix]
     static bool OverrideTilemapInfo(CameraController __instance)
     {
-        if (!WeaverTilemapManager.IsCustomTilemapScene(SceneManager.GetActiveScene().name))
+        if (!WeaverTilemapManager.IsCustomTilemapScene())
             return true;
 
         var gm = GameManager.instance;
