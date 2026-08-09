@@ -15,6 +15,7 @@
 
 		<RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
 		<RestoreLockedMode Condition="'$(CI)' == 'true'">True</RestoreLockedMode>
+    <RepositoryUrl>https://github.com/Vitaxses/WorldWeaver</RepositoryUrl>
 
     <!-- dotnet new silksongpath -->
     <ManagedFolder>$(SilksongFolder)\Hollow Knight Silksong_Data\Managed\</ManagedFolder>
