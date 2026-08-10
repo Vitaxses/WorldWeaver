@@ -6,7 +6,6 @@ namespace WorldWeaver.Managers;
 
 public static class WeaverAddressablesManager
 {
-    private static readonly Dictionary<string, string> loadPathMap = [];
     private static readonly List<string> catalogQueue = [];
 
     private static bool _registeredCatalogs = false;
@@ -43,72 +42,11 @@ public static class WeaverAddressablesManager
             Plugin.Instance.Logger.LogDebug($"[Addressables] Catalog loaded: {catalogPath}");
         }
 
-        InjectAddressablesIds();
         _registeredCatalogs = true;
         WeaverMapManager.LoadSelectedMaps();
     }
 
-    // Hopefully theres a better fix than this
-    // Not even sure if we need this anymore
-    private static void InjectAddressablesIds()
-    {
-        var previous = Addressables.InternalIdTransformFunc;
-
-        Addressables.InternalIdTransformFunc = location =>
-        {
-            string id = previous?.Invoke(location) ?? location.InternalId;
-
-            string normalized = id.Replace("\\", "/");
-            foreach (var kvp in loadPathMap)
-            {
-                var catalogLoadPath = kvp.Key;
-                var pluginPath = kvp.Value;
-
-                int index = normalized.IndexOf(catalogLoadPath, StringComparison.OrdinalIgnoreCase);
-
-                if (index < 0)
-                    continue;
-
-                string relativePath = normalized[(index + catalogLoadPath.Length)..];
-                string newId = Path.Combine(pluginPath, relativePath);
-                newId = newId.Replace("\\", "/");
-
-                Plugin.Instance.Logger.LogDebug($"[Addressables] Rewrote Addressables path: {id} -> {newId}");
-                return newId;
-            }
-            
-            return id;
-        };
-    }
-
-    private static void RegisterCatalogLoadPath(string loadPath, string pluginFolder)
-    {
-        if (string.IsNullOrWhiteSpace(loadPath))
-            return;
-
-        loadPath = loadPath.Replace("\\", "/");
-
-        if (!loadPath.EndsWith('/'))
-            loadPath += "/";
-
-        pluginFolder = pluginFolder.Replace("\\", "/");
-
-        foreach (var kvp in loadPathMap)
-        {
-            var existing = kvp.Key;
-
-            if (existing.Contains(loadPath, StringComparison.OrdinalIgnoreCase) || loadPath.Contains(existing, StringComparison.OrdinalIgnoreCase))
-            {
-                Plugin.Instance.Logger.LogError($"[Addressables] Ambiguous catalog load path.\n" + $"[Addressables] New: {loadPath}\nExisting: {existing}");
-                return;
-            }
-        }
-
-        loadPathMap[loadPath] = pluginFolder;
-        Plugin.Instance.Logger.LogDebug($"[Addressables] Added catalog load path: {loadPath} -> {pluginFolder}");
-    }
-
-    public static void RegisterAddressablesCatalog(string windows64CatalogPath, string OSXCatalogPath, string linux64CatalogPath, string catalogLoadPath, string pluginFolder)
+    public static void RegisterAddressablesCatalog(string windows64CatalogPath, string OSXCatalogPath, string linux64CatalogPath)
     {
         if (_registeredCatalogs)
         {
@@ -140,12 +78,12 @@ public static class WeaverAddressablesManager
             Plugin.Instance.Logger.LogWarning($"[Addressables] Catalog path is not rooted ({catalogPath})");
             return;
         }
+
         Plugin.Instance.Logger.LogDebug($"[Addressables] Catalog added to registration queue ({catalogPath})");
-        RegisterCatalogLoadPath(catalogLoadPath, pluginFolder);
         catalogQueue.Add(catalogPath);
     }
 
-    public static void RegisterAddressablesCatalog(string catalogFolderPath, string catalogLoadPath, string pluginFolder)
+    public static void RegisterAddressablesCatalog(string catalogFolderPath)
     {
         if (_registeredCatalogs)
         {
@@ -184,7 +122,6 @@ public static class WeaverAddressablesManager
         }
 
         Plugin.Instance.Logger.LogDebug($"[Addressables] Catalog added to registration queue ({catalogPath})");
-        RegisterCatalogLoadPath(catalogLoadPath, pluginFolder);
         catalogQueue.Add(catalogPath);
     }
 }
