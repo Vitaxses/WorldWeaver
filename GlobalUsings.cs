@@ -11,4 +11,6 @@ global using System.Linq;
 global using UnityEngine;
 global using UnityEngine.AddressableAssets;
 
+global using TooltipAttribute = HutongGames.PlayMaker.TooltipAttribute;
+
 global using HarmonyLib;
