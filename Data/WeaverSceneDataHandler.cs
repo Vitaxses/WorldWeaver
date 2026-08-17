@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using TeamCherry.SharedUtils;
 using WorldWeaver.Managers;
 
@@ -5,6 +6,7 @@ namespace WorldWeaver.Data;
 
 public abstract class WeaverSceneDataHandler : IIncludeVariableExtensions
 {
+    [JsonIgnore]
     public abstract string ModIdentifier { get; }
 
     public abstract SceneData? GetSceneData();

@@ -24,7 +24,7 @@ namespace WorldWeaver.Data.Actions
 
 		public override void OnEnter()
 		{
-            if (!storeResult.IsNone && WeaverDataManager.TryGetWorldWeaverPlugin(ModId.Value, out var plugin))
+            if (WeaverDataManager.TryGetWorldWeaverPlugin(ModId.Value, out var plugin))
             {
                 storeResult.Value = plugin.GetVariable<bool>(boolName.Value);
             }
