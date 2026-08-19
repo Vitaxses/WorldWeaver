@@ -9,6 +9,7 @@ global using System.Collections.Generic;
 global using System.Linq;
 
 global using UnityEngine;
+global using UObject = UnityEngine.Object;
 global using UnityEngine.AddressableAssets;
 
 global using TooltipAttribute = HutongGames.PlayMaker.TooltipAttribute;
