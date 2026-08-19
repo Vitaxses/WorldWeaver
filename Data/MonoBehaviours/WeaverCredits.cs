@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using GlobalEnums;
 using TeamCherry.Localization;
 using UnityEngine;
@@ -23,7 +22,8 @@ namespace WorldWeaver.Data.MonoBehaviours
         [SerializeField]
         public float DisplayTime;
     }
-    
+
+    [AddComponentMenu("WorldWeaver/Credits")]
     public class WeaverCredits : MonoBehaviour
     {
         [SerializeField]
