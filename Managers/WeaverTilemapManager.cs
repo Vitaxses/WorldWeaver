@@ -63,10 +63,10 @@ public static class WeaverTilemapManager
             #if DEBUG
 
             if (!ut.TryGetComponent<TilemapCollider2D>(out var tc2d))
-                Plugin.Instance.Logger.LogWarning($"Tilemap: {ut.name} does not have a TilemapCollider2D component, Collision may not work as expected");
+                Plugin.Instance.Logger.LogWarning($"Tilemap: {ut.name} in: {scene.name} does not have a TilemapCollider2D component, Collision may not work as expected");
 
             if (ut.gameObject.layer != 8)
-                Plugin.Instance.Logger.LogWarning($"Tilemap: {ut.name} is on layer {ut.gameObject.layer}, expected layer 8 (Terrain)");
+                Plugin.Instance.Logger.LogWarning($"Tilemap: {ut.name} in {scene.name} is layer {ut.gameObject.layer}, expected layer 8 (Terrain)");
 
             #endif
         }

@@ -47,7 +47,6 @@ public static class WeaverAchievementManager
     public static void AddAchievementsList(WeaverAchievementsList list)
     {
         Plugin.Instance.Logger.LogDebug($"[AchievementManager] Registering achievements list: {list.name}");
-        Plugin.Instance.Logger.LogDebug(list.Achievements == null); // This for some reason returns true?
         foreach (var achievement in list.Achievements)
             AddAchievement(achievement);
     }
