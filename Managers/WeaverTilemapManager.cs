@@ -1,6 +1,8 @@
 using tk2dRuntime.TileMap;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
+using WorldWeaver.Compatibility;
+using WorldWeaver.Compatibility.DebugMod;
 
 namespace WorldWeaver.Managers;
 
@@ -69,9 +71,11 @@ public static class WeaverTilemapManager
                 Plugin.Instance.Logger.LogWarning($"Tilemap: {ut.name} in {scene.name} is layer {ut.gameObject.layer}, expected layer 8 (Terrain)");
 
             #endif
+
+            DebugModCompatibility.UpdateHitbox(ut.gameObject);
         }
 
-        foreach (var tm in tk2dMaps)
+        foreach (var tm in tk2dMaps) // Maybe at some point convert all the unity tilemaps to tk2d ones
         {
             var bounds = new Bounds();
             bounds.SetMinMax(tm.transform.position, tm.transform.position + new Vector3(tm.width, tm.height, 0f));

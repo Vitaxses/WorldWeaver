@@ -14,6 +14,14 @@ public static class SceneDataExtensions
         sceneData.persistentInts.ResetSemiPersistent();
         sceneData.geoRocks.ResetSemiPersistent();
     }
+
+    
+    public static void ResetScenePersistentItems(this SceneData sceneData, string scene)
+    {
+        sceneData.persistentBools.scenes.Remove(scene);
+        sceneData.persistentInts.scenes.Remove(scene);
+        sceneData.geoRocks.scenes.Remove(scene);
+    }
     
     public static void SetValue(this SceneData sceneData, PersistentItemData<bool> value)
         => sceneData.persistentBools.SetValue(value);

@@ -65,4 +65,18 @@ public static class WeaverDataManager
             dataHandler.GetSceneData()!.ResetPersistentItems(true);
         }
     }
+
+    public static void ResetScenePersistentItems(string scene)
+    {
+        foreach (var dataHandler in registeredDataHandlers)
+        {
+            if (dataHandler.GetSceneData() == null)
+            {
+                Plugin.Instance.Logger.LogDebug($"Mod: {dataHandler.ModIdentifier} SceneData is null");
+                continue;
+            }
+            
+            dataHandler.GetSceneData()!.ResetScenePersistentItems(scene);
+        }
+    }
 }
