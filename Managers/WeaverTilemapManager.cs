@@ -80,7 +80,7 @@ public static class WeaverTilemapManager
 
             foreach (var layer in tm.Layers)
                 foreach (var chunk in layer.spriteChannel.chunks)
-                    if (chunk.gameObject != null && chunk.gameObject.activeSelf)
+                    if (chunk.gameObject != null && chunk.gameObject.activeSelf && (chunk.mesh == null || chunk.mesh.vertexCount == 0))
                         chunk.Dirty = true;
 
             RenderMeshBuilder.Build(tm, false, false); // Fix tilemap disappearing when reloading a scene
