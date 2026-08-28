@@ -24,9 +24,10 @@ public static class WeaverTilemapManager
     public static bool IsCustomTilemapScene()
     {
         bool result = false;
+        var scene = SceneManager.GetActiveScene().name;
         foreach (var func in TilemapScenePredicates)
         {
-            if (func.Invoke(SceneManager.GetActiveScene().name))
+            if (func.Invoke(scene))
                 result = true;
         }
 
