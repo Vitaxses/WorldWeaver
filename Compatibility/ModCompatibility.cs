@@ -11,10 +11,10 @@ public static class ModCompatibility
     {
         Harmony = new(Id);
 
-        if (Chainloader.PluginInfos.TryGetValue("io.github.hk-speedrunning.debugmod", out var debugInfo))
+        if (Chainloader.PluginInfos.TryGetValue(DebugModCompatibility.Id, out var debugInfo))
             DebugModCompatibility.Patch(debugInfo.Instance.GetType().Assembly, Harmony);
 
-        if (Chainloader.PluginInfos.TryGetValue("io.github.hk-speedrunning.quickwarp", out var quickwarpInfo))
+        if (Chainloader.PluginInfos.TryGetValue(QuickWarpCompatibility.Id, out var quickwarpInfo))
             QuickWarpCompatibility.Patch(quickwarpInfo.Instance.GetType().Assembly, Harmony);
     }
 }

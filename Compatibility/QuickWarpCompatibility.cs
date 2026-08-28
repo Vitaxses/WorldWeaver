@@ -6,6 +6,8 @@ namespace WorldWeaver.Compatibility;
 
 public static class QuickWarpCompatibility
 {
+    public const string Id = "io.github.hk-speedrunning.quickwarp";
+
     static Type? warpType;
     static Type? quickWarpGuiType;
 

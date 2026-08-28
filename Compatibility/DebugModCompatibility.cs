@@ -7,6 +7,8 @@ namespace WorldWeaver.Compatibility;
 
 public static class DebugModCompatibility
 {
+    public const string Id = "io.github.hk-speedrunning.debugmod";
+
     static Type? hitboxRenderType;
     static Type? bindableFunctionsType;
     static Type? hitboxTypeType;
