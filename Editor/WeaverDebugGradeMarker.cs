@@ -2,6 +2,7 @@ using UnityEngine;
 
 [ExecuteAlways]
 [RequireComponent(typeof(GradeMarker))]
+[AddComponentMenu("WorldWeaver/Debug GradeMarker")]
 public class WeaverDebugGradeMarker : MonoBehaviour
 {
     public bool show = true;

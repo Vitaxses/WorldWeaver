@@ -3,6 +3,7 @@
 using UnityEngine;
 
 [ExecuteInEditMode]
+[AddComponentMenu("WorldWeaver/Debug Collider")]
 public class WeaverDebugCollider : MonoBehaviour
 {
     public bool render = true;

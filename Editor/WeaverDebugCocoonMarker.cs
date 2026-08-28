@@ -1,6 +1,7 @@
 using UnityEngine;
 
 [ExecuteAlways] // runs in editor
+[AddComponentMenu("WorldWeaver/Debug CocoonMarker")]
 public class WeaverDebugCocoonMarker : MonoBehaviour
 {
     public bool show = true;
