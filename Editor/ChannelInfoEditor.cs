@@ -1,16 +1,17 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
-[CustomPropertyDrawer(typeof(MusicCue.MusicChannelInfo))]
-public class MusicChannelInfoEditor : PropertyDrawer
+public abstract class ChannelInfoEditor<T> : PropertyDrawer where T : Enum
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         int index = GetArrayIndex(property);
+        Array values = Enum.GetValues(typeof(T));
 
-        if (index >= 0 && index < System.Enum.GetValues(typeof(MusicChannels)).Length)
+        if (index >= 0 && index < values.Length)
         {
-            MusicChannels channel = (MusicChannels)index;
+            T channel = (T)values.GetValue(index);
             label.text = ObjectNames.NicifyVariableName(channel.ToString());
         }
 
@@ -25,7 +26,7 @@ public class MusicChannelInfoEditor : PropertyDrawer
         EditorGUI.PropertyField(position, property, label, true);
     }
 
-    private static int GetArrayIndex(SerializedProperty property)
+    private int GetArrayIndex(SerializedProperty property)
     {
         string path = property.propertyPath;
         //Debug.Log(path); channelInfos.Array.data[?]
@@ -37,4 +38,5 @@ public class MusicChannelInfoEditor : PropertyDrawer
     }
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label) => EditorGUI.GetPropertyHeight(property, label, true);
+
 }
