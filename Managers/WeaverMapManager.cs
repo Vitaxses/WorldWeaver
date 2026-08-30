@@ -113,9 +113,9 @@ public static class WeaverMapManager
 
     internal class MapHolder
     {
-        public int Priority;
-        public GameObject? Prefab;
-        public string AddressablesKey;
+        public int Priority { get; set; }
+        public GameObject? Prefab { get; set; }
+        public string AddressablesKey { get; set; }
 
         public MapHolder()
         {
