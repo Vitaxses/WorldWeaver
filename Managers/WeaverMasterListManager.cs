@@ -37,7 +37,7 @@ public abstract class ListManager<MList, Item> where MList : NamedScriptableObje
     public abstract MList? MasterList { get; }
     public bool AddingItemsToMasterList { get; private set; }
 
-    protected List<WeaverItem>? Items = new();
+    protected List<WeaverItem>? Items { get; set; } = new();
 
     public virtual void AddItemToMasterList(WeaverItem item)
     {
@@ -109,7 +109,7 @@ public abstract class ListManager<MList, Item> where MList : NamedScriptableObje
                 continue;
 
             MasterList.Add(item);
-            Plugin.Instance.Logger.LogDebug($"Added item: {item.name} to masterlist");
+            Plugin.Instance.Logger.LogDebug($"Added {item.GetType().Name}: {item.name} to masterlist");
         }
 
         Items = null;
