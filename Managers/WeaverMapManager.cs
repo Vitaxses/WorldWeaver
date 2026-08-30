@@ -16,20 +16,20 @@ public static class WeaverMapManager
 
     public static bool HasSelectedMaps { get; private set; }
 
-    public static void SetWideMap(string AddressablesKey, int priority)
+    public static void SetWideMap(string addressablesKey, int priority)
     {
         if (HasSelectedMaps)
             return;
             
-        if (AddressablesKey.IsNullOrWhiteSpace())
+        if (addressablesKey.IsNullOrWhiteSpace())
             return;
 
-        if (WideMap.priority >= priority)
+        if (WideMap.Priority >= priority)
             return;
 
-        WideMap.priority = priority;
-        WideMap.AddressablesKey = AddressablesKey;
-        WideMap.prefab = null;
+        WideMap.Priority = priority;
+        WideMap.AddressablesKey = addressablesKey;
+        WideMap.Prefab = null;
     }
 
     public static void SetWideMap(GameObject prefab, int priority)
@@ -40,28 +40,28 @@ public static class WeaverMapManager
         if (prefab == null)
             return;
 
-        if (WideMap.priority >= priority)
+        if (WideMap.Priority >= priority)
             return;
 
-        WideMap.priority = priority;
-        WideMap.prefab = prefab;
+        WideMap.Priority = priority;
+        WideMap.Prefab = prefab;
         WideMap.AddressablesKey = string.Empty;
     }
 
-    public static void SetGameMap(string AddressablesKey, int priority)
+    public static void SetGameMap(string addressablesKey, int priority)
     {
         if (HasSelectedMaps)
             return;
             
-        if (AddressablesKey.IsNullOrWhiteSpace())
+        if (addressablesKey.IsNullOrWhiteSpace())
             return;
 
-        if (GameMap.priority >= priority)
+        if (GameMap.Priority >= priority)
             return;
 
-        GameMap.priority = priority;
-        GameMap.AddressablesKey = AddressablesKey;
-        GameMap.prefab = null;
+        GameMap.Priority = priority;
+        GameMap.AddressablesKey = addressablesKey;
+        GameMap.Prefab = null;
     }
 
     public static void SetGameMap(GameObject prefab, int priority)
@@ -72,11 +72,11 @@ public static class WeaverMapManager
         if (prefab == null)
             return;
 
-        if (GameMap.priority >= priority)
+        if (GameMap.Priority >= priority)
             return;
 
-        GameMap.priority = priority;
-        GameMap.prefab = prefab;
+        GameMap.Priority = priority;
+        GameMap.Prefab = prefab;
         GameMap.AddressablesKey = string.Empty;
     }
 
@@ -87,24 +87,24 @@ public static class WeaverMapManager
 
         HasSelectedMaps = true;
 
-        if (WideMap.prefab == null && !WideMap.AddressablesKey.IsNullOrWhiteSpace())
+        if (WideMap.Prefab == null && !WideMap.AddressablesKey.IsNullOrWhiteSpace())
         {
             Addressables.LoadAssetAsync<GameObject>(WideMap.AddressablesKey).Completed += handle =>
             {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
-                    WideMap.prefab = handle.Result;
+                    WideMap.Prefab = handle.Result;
                 else
                     Plugin.Instance.Logger.LogWarning($"Failed to load wide map '{WideMap.AddressablesKey}'.");
             };
         }
 
         
-        if (GameMap.prefab == null && !GameMap.AddressablesKey.IsNullOrWhiteSpace())
+        if (GameMap.Prefab == null && !GameMap.AddressablesKey.IsNullOrWhiteSpace())
         {
             Addressables.LoadAssetAsync<GameObject>(GameMap.AddressablesKey).Completed += handle =>
             {
                 if (handle.Status == AsyncOperationStatus.Succeeded)
-                    GameMap.prefab = handle.Result;
+                    GameMap.Prefab = handle.Result;
                 else
                     Plugin.Instance.Logger.LogWarning($"Failed to load game map '{GameMap.AddressablesKey}'.");
             };
@@ -113,13 +113,13 @@ public static class WeaverMapManager
 
     internal class MapHolder
     {
-        public int priority;
-        public GameObject? prefab;
+        public int Priority;
+        public GameObject? Prefab;
         public string AddressablesKey;
 
         public MapHolder()
         {
-            priority = int.MinValue;
+            Priority = int.MinValue;
             AddressablesKey = "";
         }
     }
