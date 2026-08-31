@@ -13,17 +13,31 @@ internal static class SceneTeleportMapLoadPatch
         #if DEBUG
         string json = JsonUtility.ToJson(Resources.Load<SceneTeleportMap>("SceneTeleportMap"), true);
 
-        File.WriteAllText(Path.Combine(Paths.PluginPath, "SceneTeleportMap.json"), json);
+        File.WriteAllText(Path.Combine(Path.GetDirectoryName(Plugin.Instance.Info.Location), "SceneTeleportMap.json"), json);
         #endif
         
         foreach (var source in WeaverSceneMapManager.registeredSceneTpMaps)
         {
-            SceneTeleportMap? map = WeaverSceneMapManager.LoadMap(source);
+            if (source.IsAddressable)
+            {
+                var key = source.AddressablesKey;
+                Addressables.LoadAssetAsync<SceneTeleportMap>(source.AddressablesKey).Completed += (handle) =>
+                {
+                    if (handle.Status != UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+                    {
+                        Plugin.Instance.Logger.LogError($"Failed to load SceneTeleportMap: {handle.OperationException}");
+                        return;
+                    }
 
-            if (map == null)
+                    WeaverSceneMapManager.MergeMap(handle.Result);
+                };
                 continue;
+            }
 
-            WeaverSceneMapManager.MergeMap(map);
+            SceneTeleportMap? map = source.Map;
+
+            if (map != null)
+                WeaverSceneMapManager.MergeMap(map);
         }
     }
 
