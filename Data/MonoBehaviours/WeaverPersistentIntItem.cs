@@ -5,7 +5,7 @@ namespace WorldWeaver.Data.MonoBehaviours;
 public class WeaverPersistentIntItem : PersistentIntItem
 {
     [SerializeField]
-    private string ModId;
+    public string ModId;
 
     public override void SaveValue(PersistentItemData<int> newItemData)
     {

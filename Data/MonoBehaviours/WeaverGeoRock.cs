@@ -6,7 +6,7 @@ namespace WorldWeaver.Data.MonoBehaviours;
 public class WeaverGeoRock : GeoRock
 {
     [SerializeField]
-    private string ModId;
+    public string ModId;
 
     new void OnEnable()
     {
