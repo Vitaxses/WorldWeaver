@@ -1,4 +1,5 @@
 using HutongGames.PlayMaker;
+using WorldWeaver.Editor;
 
 namespace WorldWeaver.Data.Actions
 {
@@ -23,7 +24,8 @@ namespace WorldWeaver.Data.Actions
 			boolName = null!;
 			isTrue = null!;
 			isFalse = null!;
-            ModId = null!;
+            if (string.IsNullOrEmpty(ModId?.Value))
+                ModId = WorldWeaverSettings.Instance.ModIdDefault;
 		}
 
 		public override void OnEnter()

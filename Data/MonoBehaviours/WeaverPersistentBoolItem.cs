@@ -1,4 +1,5 @@
 using UnityEngine;
+using WorldWeaver.Editor;
 
 namespace WorldWeaver.Data.MonoBehaviours
 {
@@ -7,7 +8,12 @@ namespace WorldWeaver.Data.MonoBehaviours
     {
         [Space(2)]
         [Header("WorldWeaver")]
-        [SerializeField]
-        private string ModId = "";
+        public string ModId = "";
+
+        void OnValidate()
+        {
+            if (string.IsNullOrEmpty(ModId))
+                ModId = WorldWeaverSettings.Instance.ModIdDefault;
+        }
     }
 }
