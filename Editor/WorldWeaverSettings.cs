@@ -39,6 +39,24 @@ namespace WorldWeaver.Editor
         public string ModIdDefault = string.Empty;
 
         [Space(4)]
+        [Header("Play Bootstrap")]
+
+        [SerializeField]
+        public bool PlayBootstrapEnabled;
+        
+        [SerializeField]
+        public string PlayBootstrapBootScene = "Menu_Title";
+
+        [SerializeField]
+        public int PlayBootstrapTimeoutFrames = 900;
+        
+        [SerializeField]
+        public KeyCode PlayBootstrapNoClipKey = KeyCode.Comma;
+        
+        [SerializeField]
+        public KeyCode PlayBootstrapInvincibilityKey = KeyCode.Period;
+
+        [Space(4)]
         [Header("Scene Teleport Map")]
 
         [SerializeField]
