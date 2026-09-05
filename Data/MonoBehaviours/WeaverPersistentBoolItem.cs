@@ -3,7 +3,7 @@ using WorldWeaver.Editor;
 
 namespace WorldWeaver.Data.MonoBehaviours
 {
-    [AddComponentMenu("WorldWeaver/Persistent Bool Item")]
+    [AddComponentMenu("WorldWeaver/Weaver Persistent Bool Item")]
     public class WeaverPersistentBoolItem : PersistentBoolItem
     {
         [Space(2)]

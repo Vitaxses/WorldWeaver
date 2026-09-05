@@ -3,7 +3,7 @@ using WorldWeaver.Editor;
 
 namespace WorldWeaver.Data.MonoBehaviours
 {
-    [AddComponentMenu("WorldWeaver/Persistent Int Item")]
+    [AddComponentMenu("WorldWeaver/Weaver Persistent Int Item")]
     public class WeaverPersistentIntItem : PersistentIntItem
     {
         [Space(2)]

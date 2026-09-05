@@ -3,7 +3,7 @@ using WorldWeaver.Editor;
 
 namespace WorldWeaver.Data.MonoBehaviours
 {
-    [AddComponentMenu("WorldWeaver/Geo Rock")]
+    [AddComponentMenu("WorldWeaver/Weaver Geo Rock")]
     public class WeaverGeoRock : GeoRock
     {
         [Space(2)]
