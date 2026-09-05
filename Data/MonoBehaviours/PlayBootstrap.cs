@@ -1,5 +1,4 @@
 using System.Collections;
-using HutongGames.PlayMaker.Actions;
 using TeamCherry.SharedUtils;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -13,16 +12,13 @@ namespace WorldWeaver.Data.MonoBehaviours
 {
     public class PlayBootstrap : MonoBehaviour
     {
-        private static bool NoClip;
-        private static bool IsInvincible;
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void Create()
         {
             if (!WorldWeaverSettings.Instance.PlayBootstrapEnabled)
                 return;
 
-            DontDestroyOnLoad(new GameObject(nameof(PlayBootstrap), typeof(PlayBootstrap), typeof(SceneDataFixer)));
+            DontDestroyOnLoad(new GameObject(nameof(PlayBootstrap), typeof(PlayBootstrap), typeof(SceneDataFixer), typeof(CheatManagerUI)));
         }
 
         void Start()
@@ -53,32 +49,10 @@ namespace WorldWeaver.Data.MonoBehaviours
             if (!pd.respawnScene.StartsWith("Tut_01"))
                 pd.bindCutscenePlayed = true; // Fix hp not showing when using empty save
 
-            pd.hasNeedolin = true;
-            pd.hasNeedolinMemoryPowerup = true;
-            pd.UnlockedFastTravelTeleport = true;
-
-            pd.hasSuperJump = true;
-            pd.hasChargeSlash = true;
-            pd.hasHarpoonDash = true;
-            pd.hasNeedleThrow = true;
-            pd.GetAllPowerups(); // Cloak, Dash, Cling Grip & Faydown
             pd.ActivateTestingCheats(); // 5000 rosaries
 
+            //LoadBootPrefabs();
             StartCoroutine(LoadBootScene());
-        }
-
-        void Update()
-        {
-            if (HeroController.SilentInstance == null || InputHandler.SilentInstance == null)
-                return;
-
-            if (Input.GetKeyDown(WorldWeaverSettings.Instance.PlayBootstrapNoClipKey) && !(NoClip = !NoClip))
-                HeroController.instance.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePosition;
-            
-            else if (Input.GetKeyDown(WorldWeaverSettings.Instance.PlayBootstrapInvincibilityKey))
-                PlayerData.instance.isInvincible = IsInvincible = !IsInvincible;
-                
-            
         }
 
         private static IEnumerator LoadBootScene()
@@ -110,7 +84,27 @@ namespace WorldWeaver.Data.MonoBehaviours
                 yield return null;
             }
 
+            FindFirstObjectByType<UIManager>()?.mainMenuButtons.gameObject.SetActive(false);
             GameManager.instance.ContinueGame();
+        }
+
+        private static void LoadBootPrefabs()
+        {
+            if (WorldWeaverSettings.Instance.PlayBootstrapBootGameManagerPrefab == null)
+            {
+                Debug.LogError("[PlayBootstrap] GameManager prefab is null on WorldWeaverSettings");
+                return;
+            }
+
+            EditorSceneManager.CreateScene("PlayBootstrap_Loader");
+            EditorSceneManager.UnloadSceneAsync(EditorSceneManager.GetActiveScene());
+
+            var gm = Instantiate(WorldWeaverSettings.Instance.PlayBootstrapBootGameManagerPrefab)!;
+            var ui = Instantiate(WorldWeaverSettings.Instance.PlayBootstrapBootUIManagerPrefab)!;
+            Instantiate(WorldWeaverSettings.Instance.PlayBootstrapBootGameCamerasPrefab);
+
+            ui.GetComponent<UIManager>().mainMenuScreen.gameObject.SetActive(false);
+            gm.GetComponent<GameManager>().ContinueGame();
         }
 
         string GetRespawn()
@@ -133,7 +127,7 @@ namespace WorldWeaver.Data.MonoBehaviours
                 return existing.name;
             }
 
-            var gate = FindAnyObjectByType<TransitionPoint>(FindObjectsInactive.Include);
+            var gate = FindFirstObjectByType<TransitionPoint>(FindObjectsInactive.Include);
             if (gate == null)
             {
                 HazardRespawnMarker hazardRespawn = FindFirstObjectByType<HazardRespawnMarker>(FindObjectsInactive.Include);
@@ -181,7 +175,7 @@ namespace WorldWeaver.Data.MonoBehaviours
                 return name;
             }
 
-            Debug.LogError($"Could not find ground point below {position}.");
+            Debug.LogError($"[PlayBootstrap] Could not find ground point below {position}.");
             return string.Empty;
         }
 
