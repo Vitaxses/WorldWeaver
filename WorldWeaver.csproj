@@ -18,7 +18,7 @@
     <RepositoryUrl>https://github.com/Vitaxses/WorldWeaver</RepositoryUrl>
 
     <!-- dotnet new silksongpath -->
-    <ManagedFolder>$(SilksongFolder)\Hollow Knight Silksong_Data\Managed\</ManagedFolder>
+    <ManagedFolder>$(SilksongFolder)/Hollow Knight Silksong_Data/Managed/</ManagedFolder>
 	</PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +29,17 @@
       <HintPath>$(UnityEditorManagedFolder)/UnityEditor.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    
+    <Reference Include="Unity.Addressables.Editor">
+      <HintPath>$(UnityProjectScriptAssembliesPath)/Unity.Addressables.Editor.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <Reference Include="Unity.Addressables">
+      <HintPath>$(UnityProjectScriptAssembliesPath)/Unity.Addressables.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
   </ItemGroup>
 </Project>
 
