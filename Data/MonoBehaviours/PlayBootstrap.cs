@@ -1,6 +1,6 @@
 using System.Collections;
+using System.Reflection;
 using TeamCherry.SharedUtils;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -23,9 +23,12 @@ namespace WorldWeaver.Data.MonoBehaviours
 
         void Start()
         {
+            if (!Application.isEditor)
+                return;
+
             if (GameObject.FindGameObjectWithTag("SceneManager") == null)
             {
-                Debug.LogError($"[PlayBootstrap] Scene '{EditorSceneManager.GetActiveScene().name}' has no object tagged \"SceneManager \" (CustomSceneManager). The save-load flow requires one, so boot was aborted. " +
+                Debug.LogError($"[PlayBootstrap] Scene '{SceneManager.GetActiveScene().name}' has no object tagged \"SceneManager \" (CustomSceneManager). The save-load flow requires one, so boot was aborted. " +
                     "Pick a scene that contains a SceneManager (e.g. Under_01).");
                 return;
             }
@@ -41,7 +44,7 @@ namespace WorldWeaver.Data.MonoBehaviours
 
             if (string.IsNullOrEmpty(pd.respawnMarkerName))
             {
-                Debug.LogError($"[PlayBootstrap] Boot aborted: no respawn marker was found. Ensure {EditorSceneManager.GetActiveScene().name} contains a valid respawn marker.");
+                Debug.LogError($"[PlayBootstrap] Boot aborted: no respawn marker was found. Ensure {SceneManager.GetActiveScene().name} contains a valid respawn marker.");
                 Destroy(gameObject);
                 return;
             }
@@ -51,11 +54,74 @@ namespace WorldWeaver.Data.MonoBehaviours
 
             pd.ActivateTestingCheats(); // 5000 rosaries
 
-            //LoadBootPrefabs();
-            StartCoroutine(LoadBootScene());
+            StartCoroutine(BootInPlace());
         }
 
-        private static IEnumerator LoadBootScene()
+        private IEnumerator BootInPlace()
+        {
+            string sceneName = SceneManager.GetActiveScene().name;
+
+            AsyncOperationHandle<GameObject> uiHandle = Addressables.LoadAssetAsync<GameObject>("_UIManager");
+            AsyncOperationHandle<GameObject> camerasHandle = Addressables.LoadAssetAsync<GameObject>("_GameCameras");
+            AsyncOperationHandle<GameObject> gmHandle = Addressables.LoadAssetAsync<GameObject>("_GameManager");
+
+            yield return uiHandle;
+            yield return camerasHandle;
+            yield return gmHandle;
+
+            if (uiHandle.Status != AsyncOperationStatus.Succeeded ||
+                camerasHandle.Status != AsyncOperationStatus.Succeeded ||
+                gmHandle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogError($"[PlayBootstrap] Failed to load core managers for in-place boot. " +
+                    $"UI={uiHandle.Status} Cams={camerasHandle.Status} GM={gmHandle.Status}. " +
+                    "Falling back to the menu boot scene.");
+                if (uiHandle.OperationException != null) Debug.LogException(uiHandle.OperationException);
+                if (camerasHandle.OperationException != null) Debug.LogException(camerasHandle.OperationException);
+                if (gmHandle.OperationException != null) Debug.LogException(gmHandle.OperationException);
+                yield return StartCoroutine(LoadBootScene());
+                yield break;
+            }
+
+            Instantiate(uiHandle.Result);
+            Instantiate(camerasHandle.Result);
+            Instantiate(gmHandle.Result);
+
+            yield return null;
+            yield return null;
+
+            int frames = 0;
+            var timeoutFrames = WorldWeaverSettings.Instance.PlayBootstrapTimeoutFrames;
+
+            while (GameManager.SilentInstance == null)
+            {
+                if (frames >= timeoutFrames)
+                {
+                    Debug.LogError("[PlayBootstrap] Timed out waiting for GameManager after instantiating core managers.");
+                    yield break;
+                }
+
+                frames++;
+                yield return null;
+            }
+
+            Debug.Log($"[PlayBootstrap] In-place boot of '{sceneName}' complete (menu skipped, no scene load).");
+
+            GameManager gm = GameManager.SilentInstance;
+
+            if (gm.ui == null)
+                typeof(GameManager).GetProperty(nameof(GameManager.ui))?.SetValue(gm, UIManager.instance);
+
+            if (gm.ui == null)
+            {
+                Debug.LogError("[PlayBootstrap] Could not find a UIManager to attach to GameManager; boot aborted.");
+                yield break;
+            }
+
+            gm.ContinueGame();
+        }
+
+        private IEnumerator LoadBootScene()
         {
             string bootScene = WorldWeaverSettings.Instance.PlayBootstrapBootScene;
             var handle = Addressables.LoadSceneAsync($"Scenes/{bootScene}", LoadSceneMode.Single);
@@ -86,25 +152,6 @@ namespace WorldWeaver.Data.MonoBehaviours
 
             FindFirstObjectByType<UIManager>()?.mainMenuButtons.gameObject.SetActive(false);
             GameManager.instance.ContinueGame();
-        }
-
-        private static void LoadBootPrefabs()
-        {
-            if (WorldWeaverSettings.Instance.PlayBootstrapBootGameManagerPrefab == null)
-            {
-                Debug.LogError("[PlayBootstrap] GameManager prefab is null on WorldWeaverSettings");
-                return;
-            }
-
-            EditorSceneManager.CreateScene("PlayBootstrap_Loader");
-            EditorSceneManager.UnloadSceneAsync(EditorSceneManager.GetActiveScene());
-
-            var gm = Instantiate(WorldWeaverSettings.Instance.PlayBootstrapBootGameManagerPrefab)!;
-            var ui = Instantiate(WorldWeaverSettings.Instance.PlayBootstrapBootUIManagerPrefab)!;
-            Instantiate(WorldWeaverSettings.Instance.PlayBootstrapBootGameCamerasPrefab);
-
-            ui.GetComponent<UIManager>().mainMenuScreen.gameObject.SetActive(false);
-            gm.GetComponent<GameManager>().ContinueGame();
         }
 
         string GetRespawn()
@@ -138,7 +185,7 @@ namespace WorldWeaver.Data.MonoBehaviours
                     return name;
                 }
 
-                Debug.LogError($"[PlayBootstrap] Scene '{EditorSceneManager.GetActiveScene().name}' has no respawn marker or transition point.");
+                Debug.LogError($"[PlayBootstrap] Scene '{SceneManager.GetActiveScene().name}' has no respawn marker or transition point.");
                 return string.Empty;
             }
 
