@@ -2,23 +2,26 @@ using TeamCherry.Localization;
 using UnityEditor;
 using UnityEngine;
 
-[CustomPropertyDrawer(typeof(LocalisedString))]
-public class LocalisedStringEditor : PropertyDrawer
+namespace WorldWeaver.Editor 
 {
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    [CustomPropertyDrawer(typeof(LocalisedString))]
+    public class LocalisedStringEditor : PropertyDrawer
     {
-        SerializedProperty keyProperty = property.FindPropertyRelative("Key");
-
-        if (keyProperty != null && !string.IsNullOrEmpty(keyProperty.stringValue))
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            label = new GUIContent($"{label.text} ({keyProperty.stringValue})");
+            SerializedProperty keyProperty = property.FindPropertyRelative("Key");
+
+            if (keyProperty != null && !string.IsNullOrEmpty(keyProperty.stringValue))
+            {
+                label = new GUIContent($"{label.text} ({keyProperty.stringValue})");
+            }
+
+            EditorGUI.PropertyField(position, property, label, true);
         }
 
-        EditorGUI.PropertyField(position, property, label, true);
-    }
-
-    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-    {
-        return EditorGUI.GetPropertyHeight(property, true);
-    }
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            return EditorGUI.GetPropertyHeight(property, true);
+        }
+    }   
 }

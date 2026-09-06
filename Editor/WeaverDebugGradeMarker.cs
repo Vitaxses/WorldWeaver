@@ -1,37 +1,40 @@
 using UnityEngine;
 
-[ExecuteAlways]
-[RequireComponent(typeof(GradeMarker))]
-[AddComponentMenu("WorldWeaver/Debug GradeMarker")]
-public class WeaverDebugGradeMarker : MonoBehaviour
+namespace WorldWeaver.Editor
 {
-    public bool show = true;
-
-    public Color innerColor = Color.cyan;
-    public Color outerColor = Color.blue;
-
-    private GradeMarker? marker;
-
-    private void OnDrawGizmos()
+    [ExecuteAlways]
+    [RequireComponent(typeof(GradeMarker))]
+    [AddComponentMenu("WorldWeaver/Debug GradeMarker")]
+    public class WeaverDebugGradeMarker : MonoBehaviour
     {
-        if (!show) return;
+        public bool show = true;
 
-        if (marker == null)
-            marker = GetComponent<GradeMarker>();
+        public Color innerColor = Color.cyan;
+        public Color outerColor = Color.blue;
 
-        if (marker == null) return;
+        private GradeMarker? marker;
 
-        Vector3 pos = transform.position;
+        private void OnDrawGizmos()
+        {
+            if (!show) return;
 
-        float inner = marker.maxIntensityRadius;
-        float outer = marker.cutoffRadius;
+            if (marker == null)
+                marker = GetComponent<GradeMarker>();
 
-        // Outer cutoff ring
-        Gizmos.color = outerColor;
-        Gizmos.DrawWireSphere(pos, outer);
+            if (marker == null) return;
 
-        // Inner full-intensity ring
-        Gizmos.color = innerColor;
-        Gizmos.DrawWireSphere(pos, inner);
-    }
+            Vector3 pos = transform.position;
+
+            float inner = marker.maxIntensityRadius;
+            float outer = marker.cutoffRadius;
+
+            // Outer cutoff ring
+            Gizmos.color = outerColor;
+            Gizmos.DrawWireSphere(pos, outer);
+
+            // Inner full-intensity ring
+            Gizmos.color = innerColor;
+            Gizmos.DrawWireSphere(pos, inner);
+        }
+    }   
 }

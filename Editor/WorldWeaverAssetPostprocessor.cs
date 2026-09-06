@@ -1,23 +1,26 @@
 using UnityEditor;
 using WorldWeaver.Editor.Windows;
 
-public class WorldWeaverAssetPostprocessor : AssetPostprocessor
+namespace WorldWeaver.Editor
 {
-    private static bool isProcessing;
-
-    static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+    public class WorldWeaverAssetPostprocessor : AssetPostprocessor
     {
-        if (isProcessing || !SceneTeleportMapWindow.AutoGenerateTPMWithImport)
-            return;
+        private static bool isProcessing;
 
-        try
+        static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
-            isProcessing = true;
-            SceneTeleportMapWindow.Generate();
+            if (isProcessing || !SceneTeleportMapWindow.AutoGenerateTPMWithImport)
+                return;
+
+            try
+            {
+                isProcessing = true;
+                SceneTeleportMapWindow.Generate();
+            }
+            finally
+            {
+                isProcessing = false;
+            }
         }
-        finally
-        {
-            isProcessing = false;
-        }
-    }
+    }   
 }

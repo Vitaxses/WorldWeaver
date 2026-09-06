@@ -2,91 +2,94 @@
 
 using UnityEngine;
 
-[ExecuteInEditMode]
-[AddComponentMenu("WorldWeaver/Debug Collider")]
-public class WeaverDebugCollider : MonoBehaviour
+namespace WorldWeaver.Editor
 {
-    public bool render = true;
-
-    [SerializeField]
-    private Color gizmoColor = Color.magenta;
-
-    private void OnDrawGizmos()
+    [ExecuteInEditMode]
+    [AddComponentMenu("WorldWeaver/Debug Collider")]
+    public class WeaverDebugCollider : MonoBehaviour
     {
-        if (!render)
-            return;
+        public bool render = true;
 
-        Gizmos.color = gizmoColor;
-        Gizmos.matrix = transform.localToWorldMatrix;
+        [SerializeField]
+        private Color gizmoColor = Color.magenta;
 
-        // Box
-        var box = GetComponent<BoxCollider2D>();
-        if (box != null)
+        private void OnDrawGizmos()
         {
-            Gizmos.DrawWireCube(box.offset, box.size);
-        }
+            if (!render)
+                return;
 
-        // Composite
-        var composite = GetComponent<CompositeCollider2D>();
-        if (composite != null)
-        {
-            DrawComposite(composite);
-        }
+            Gizmos.color = gizmoColor;
+            Gizmos.matrix = transform.localToWorldMatrix;
 
-        // Polygon
-        var poly = GetComponent<PolygonCollider2D>();
-        if (poly != null)
-        {
-            DrawPolygon(poly);
-        }
-
-        // Edge
-        var edge = GetComponent<EdgeCollider2D>();
-        if (edge != null)
-        {
-            DrawEdge(edge);
-        }
-    }
-
-    static void DrawComposite(CompositeCollider2D col)
-    {
-        for (int i = 0; i < col.pathCount; i++)
-        {
-            int count = col.GetPathPointCount(i);
-            Vector2[] points = new Vector2[count];
-            col.GetPath(i, points);
-
-            for (int j = 0; j < count; j++)
+            // Box
+            var box = GetComponent<BoxCollider2D>();
+            if (box != null)
             {
-                Vector2 a = points[j];
-                Vector2 b = points[(j + 1) % count];
-                Gizmos.DrawLine(a, b);
+                Gizmos.DrawWireCube(box.offset, box.size);
+            }
+
+            // Composite
+            var composite = GetComponent<CompositeCollider2D>();
+            if (composite != null)
+            {
+                DrawComposite(composite);
+            }
+
+            // Polygon
+            var poly = GetComponent<PolygonCollider2D>();
+            if (poly != null)
+            {
+                DrawPolygon(poly);
+            }
+
+            // Edge
+            var edge = GetComponent<EdgeCollider2D>();
+            if (edge != null)
+            {
+                DrawEdge(edge);
             }
         }
-    }
 
-    static void DrawPolygon(PolygonCollider2D col)
-    {
-        for (int i = 0; i < col.pathCount; i++)
+        static void DrawComposite(CompositeCollider2D col)
         {
-            var points = col.GetPath(i);
-
-            for (int j = 0; j < points.Length; j++)
+            for (int i = 0; i < col.pathCount; i++)
             {
-                Vector2 a = points[j];
-                Vector2 b = points[(j + 1) % points.Length];
-                Gizmos.DrawLine(a, b);
+                int count = col.GetPathPointCount(i);
+                Vector2[] points = new Vector2[count];
+                col.GetPath(i, points);
+
+                for (int j = 0; j < count; j++)
+                {
+                    Vector2 a = points[j];
+                    Vector2 b = points[(j + 1) % count];
+                    Gizmos.DrawLine(a, b);
+                }
             }
         }
-    }
 
-    static void DrawEdge(EdgeCollider2D col)
-    {
-        var points = col.points;
-
-        for (int i = 0; i < points.Length - 1; i++)
+        static void DrawPolygon(PolygonCollider2D col)
         {
-            Gizmos.DrawLine(points[i], points[i + 1]);
+            for (int i = 0; i < col.pathCount; i++)
+            {
+                var points = col.GetPath(i);
+
+                for (int j = 0; j < points.Length; j++)
+                {
+                    Vector2 a = points[j];
+                    Vector2 b = points[(j + 1) % points.Length];
+                    Gizmos.DrawLine(a, b);
+                }
+            }
         }
-    }
+
+        static void DrawEdge(EdgeCollider2D col)
+        {
+            var points = col.points;
+
+            for (int i = 0; i < points.Length - 1; i++)
+            {
+                Gizmos.DrawLine(points[i], points[i + 1]);
+            }
+        }
+    }   
 }
