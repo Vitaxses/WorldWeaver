@@ -48,15 +48,6 @@ namespace WorldWeaver.Editor
         public string PlayBootstrapBootScene = "Menu_Title";
 
         [SerializeField]
-        public GameObject? PlayBootstrapBootGameManagerPrefab;
-        
-        [SerializeField]
-        public GameObject? PlayBootstrapBootUIManagerPrefab;
-        
-        [SerializeField]
-        public GameObject? PlayBootstrapBootGameCamerasPrefab;
-
-        [SerializeField]
         public int PlayBootstrapTimeoutFrames = 900;
         
         [SerializeField]

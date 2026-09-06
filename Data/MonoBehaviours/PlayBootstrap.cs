@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Reflection;
 using TeamCherry.SharedUtils;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -53,6 +52,7 @@ namespace WorldWeaver.Data.MonoBehaviours
                 pd.bindCutscenePlayed = true; // Fix hp not showing when using empty save
 
             pd.ActivateTestingCheats(); // 5000 rosaries
+            pd.AddShards(5000);
 
             StartCoroutine(BootInPlace());
         }
@@ -79,6 +79,7 @@ namespace WorldWeaver.Data.MonoBehaviours
                 if (uiHandle.OperationException != null) Debug.LogException(uiHandle.OperationException);
                 if (camerasHandle.OperationException != null) Debug.LogException(camerasHandle.OperationException);
                 if (gmHandle.OperationException != null) Debug.LogException(gmHandle.OperationException);
+                
                 yield return StartCoroutine(LoadBootScene());
                 yield break;
             }
@@ -110,15 +111,15 @@ namespace WorldWeaver.Data.MonoBehaviours
             GameManager gm = GameManager.SilentInstance;
 
             if (gm.ui == null)
-                typeof(GameManager).GetProperty(nameof(GameManager.ui))?.SetValue(gm, UIManager.instance);
+                gm.ui = UIManager.instance;
 
-            if (gm.ui == null)
+            if (gm.ui != null)
             {
-                Debug.LogError("[PlayBootstrap] Could not find a UIManager to attach to GameManager; boot aborted.");
+                gm.ContinueGame();
                 yield break;
             }
 
-            gm.ContinueGame();
+            Debug.LogError("[PlayBootstrap] Could not find a UIManager to attach to GameManager; boot aborted.");
         }
 
         private IEnumerator LoadBootScene()

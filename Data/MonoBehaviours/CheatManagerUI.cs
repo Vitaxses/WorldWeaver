@@ -163,16 +163,16 @@ namespace WorldWeaver.Data.MonoBehaviours
             if (Button("Quests", 7))
                 OpenMenu(MenuStates.Quests);
 
-            if (Button("Achievements", 9))
+            if (Button("Achievements", 8))
                 OpenMenu(MenuStates.Achievements);
 
-            if (Button($"NoClip: {OnOff(noClip)}", 11, isSmall: true))
+            if (Button($"NoClip: {OnOff(noClip)}", 10, isSmall: true))
                 SetNoClip(!noClip);
 
-            if (Button($"Invincibility: {Invincibility}", 11, isSmall: true, isLeftSide: false))
+            if (Button($"Invincibility: {Invincibility}", 10, isSmall: true, isLeftSide: false))
                 CycleInvincibility();
 
-            if (Button($"Nail Damage: {NailDamage}", 12))
+            if (Button($"Nail Damage: {NailDamage}", 11))
                 if (NailDamage++ > NailDamageStates.InstaKill)
                     NailDamage = 0;
         }
