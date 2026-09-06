@@ -25,9 +25,11 @@ namespace WorldWeaver.Data.MonoBehaviours
             if (!Application.isEditor)
                 return;
 
-            if (GameObject.FindGameObjectWithTag("SceneManager") == null)
+            var sceneManager = GameObject.FindGameObjectWithTag("SceneManager");
+
+            if (sceneManager == null || !sceneManager.TryGetComponent<CustomSceneManager>(out _))
             {
-                Debug.LogError($"[PlayBootstrap] Scene '{SceneManager.GetActiveScene().name}' has no object tagged \"SceneManager \" (CustomSceneManager). The save-load flow requires one, so boot was aborted. " +
+                Debug.LogError($"[PlayBootstrap] Scene '{SceneManager.GetActiveScene().name}' has no object tagged \"SceneManager\" (CustomSceneManager). The save-load flow requires one, so boot was aborted. " +
                     "Pick a scene that contains a SceneManager (e.g. Under_01).");
                 return;
             }
@@ -52,18 +54,20 @@ namespace WorldWeaver.Data.MonoBehaviours
                 pd.bindCutscenePlayed = true; // Fix hp not showing when using empty save
 
             pd.ActivateTestingCheats(); // 5000 rosaries
-            pd.AddShards(5000);
+            pd.ShellShards += 5000;
 
-            StartCoroutine(BootInPlace());
+            StartCoroutine(BootInPlace(sceneManager));
         }
 
-        private IEnumerator BootInPlace()
+        private IEnumerator BootInPlace(GameObject sceneManager)
         {
             string sceneName = SceneManager.GetActiveScene().name;
+            Instantiate(sceneManager, SceneManager.CreateScene("PlayBootstrap"));
+            SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
 
-            AsyncOperationHandle<GameObject> uiHandle = Addressables.LoadAssetAsync<GameObject>("_UIManager");
-            AsyncOperationHandle<GameObject> camerasHandle = Addressables.LoadAssetAsync<GameObject>("_GameCameras");
-            AsyncOperationHandle<GameObject> gmHandle = Addressables.LoadAssetAsync<GameObject>("_GameManager");
+            var uiHandle = Addressables.LoadAssetAsync<GameObject>("_UIManager");
+            var camerasHandle = Addressables.LoadAssetAsync<GameObject>("_GameCameras");
+            var gmHandle = Addressables.LoadAssetAsync<GameObject>("_GameManager");
 
             yield return uiHandle;
             yield return camerasHandle;
@@ -106,7 +110,7 @@ namespace WorldWeaver.Data.MonoBehaviours
                 yield return null;
             }
 
-            Debug.Log($"[PlayBootstrap] In-place boot of '{sceneName}' complete (menu skipped, no scene load).");
+            Debug.Log($"[PlayBootstrap] Boot of '{sceneName}' complete (menu title skipped).");
 
             GameManager gm = GameManager.SilentInstance;
 
@@ -115,7 +119,7 @@ namespace WorldWeaver.Data.MonoBehaviours
 
             if (gm.ui != null)
             {
-                gm.ContinueGame();
+                yield return gm.RunContinueGame(fromMenu: false);
                 yield break;
             }
 
@@ -214,7 +218,7 @@ namespace WorldWeaver.Data.MonoBehaviours
             
             RaycastHit2D closestHit = new()
             {
-                point = new()
+                point = position
             };
 
             if (gatePos is top or door || Helper.IsRayHittingNoTriggers(position, Vector2.down, 10, 8448, out closestHit) || Helper.IsRayHittingNoTriggers(position = offset * -1 + gate.transform.position, Vector2.down, 10, 8448, out closestHit))
