@@ -314,23 +314,14 @@ namespace WorldWeaver.Editor.Windows
             {
                 var transition = transitions[i];
 
-                if (!data.RespawnPoints.Contains(transition.name))
-                    data.RespawnPoints.Add(transition.name);
+                if (!data.TransitionGates.Contains(transition.name))
+                    data.TransitionGates.Add(transition.name);
             }
 
             var respawns = FindObjectsByType<RespawnMarker>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             for (int i = 0; i < respawns.Length; i++)
             {
                 var respawn = respawns[i];
-
-                if (!data.RespawnPoints.Contains(respawn.name))
-                    data.RespawnPoints.Add(respawn.name);
-            }
-            
-            var benches = FindObjectsByType<RestBench>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            for (int i = 0; i < benches.Length; i++)
-            {
-                var respawn = benches[i];
 
                 if (!data.RespawnPoints.Contains(respawn.name))
                     data.RespawnPoints.Add(respawn.name);
