@@ -68,6 +68,11 @@ namespace WorldWeaver.Data.MonoBehaviours
             HandleKeybinds();
         }
 
+        void Start()
+        {
+            IsTextPrintSkipEnabled = true;
+        }
+
         private void OnGUI()
         {
             if (!IsOpen)
