@@ -177,7 +177,7 @@ namespace WorldWeaver.Data.MonoBehaviours
             if (Button($"Invincibility: {Invincibility}", 10, isSmall: true, isLeftSide: false))
                 CycleInvincibility();
 
-            if (Button($"Nail Damage: {NailDamage}", 11))
+            if (Button($"Needle Damage State: {NailDamage}", 11))
                 if (NailDamage++ > NailDamageStates.InstaKill)
                     NailDamage = 0;
         }
@@ -367,28 +367,36 @@ namespace WorldWeaver.Data.MonoBehaviours
             if (Button("Add Silk Heart", 5))
                 HeroController.instance?.AddToMaxSilkRegen(1);
 
-            Label("Variable Name", 7);
-            pdVariableName = GUI.TextField(Rect(8), pdVariableName);
-            
-            Label("Value", 9);
-            pdVariableValue = GUI.TextField(Rect(10), pdVariableValue);
+            if (Button($"Needle Damage: {PlayerData.instance.nailDamage}", 6))
+            {
+                PlayerData.instance.nailUpgrades++;
+                
+                if (PlayerData.instance.nailUpgrades > 4)
+                    PlayerData.instance.nailUpgrades = 0;
+            }
 
-            if (Button($"Type: {pdVariableType}", 11) && pdVariableType++ > PlayerDataVariableType.Bool)
+            Label("Variable Name", 8);
+            pdVariableName = GUI.TextField(Rect(9), pdVariableName);
+            
+            Label("Value", 10);
+            pdVariableValue = GUI.TextField(Rect(11), pdVariableValue);
+
+            if (Button($"Type: {pdVariableType}", 12) && pdVariableType++ > PlayerDataVariableType.Bool)
                 pdVariableType = 0;
 
             if (string.IsNullOrEmpty(pdVariableName) || string.IsNullOrEmpty(pdVariableValue))
             {
-                BackButton(13);
+                BackButton(14);
                 return;
             }
 
-            if (Button("Set Variable", 12))
+            if (Button("Set Variable", 13))
                 SetPlayerDataVariable();
 
-            if (Button("Get Variable", 13))
+            if (Button("Get Variable", 14))
                 Debug.Log($"[CheatManagerUI] Result: {GetPlayerDataVariable()}");
 
-            BackButton(15);
+            BackButton(16);
         }
 
         private void SetPlayerDataVariable()
