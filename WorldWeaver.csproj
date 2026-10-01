@@ -24,6 +24,7 @@
   <ItemGroup>
     <PackageReference Include="UnityEngine.Modules" Version="6000.0.50" IncludeAssets="compile" />
     <PackageReference Include="Silksong.GameLibs" Version="*-*" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Unity.Analyzers" Version="1.25.0" PrivateAssets="all" />
 
     <Reference Include="UnityEditor">
       <HintPath>$(UnityEditorManagedFolder)/UnityEditor.dll</HintPath>

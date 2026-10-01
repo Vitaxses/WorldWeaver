@@ -1,9 +1,10 @@
 using UnityEditor;
 using UnityEngine;
+using WorldWeaver.Data.MonoBehaviours;
 
 namespace WorldWeaver.Editor
 {
-    [CustomPropertyDrawer(typeof(WorldWeaver.Data.MonoBehaviours.Pane))]
+    [CustomPropertyDrawer(typeof(WeaverCredits.Pane))]
     public class WeaverCreditsPaneEditor : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

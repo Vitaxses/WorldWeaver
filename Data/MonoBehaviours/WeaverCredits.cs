@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using GlobalEnums;
 using TeamCherry.Localization;
@@ -5,29 +6,11 @@ using UnityEngine;
 
 namespace WorldWeaver.Data.MonoBehaviours
 {
-    [System.Serializable]
-    public class Pane
-    {
-        [SerializeField]
-        public LocalisedString Label;
-        [SerializeField]
-        public LocalisedString Name;
-
-        [Space]
-
-        [SerializeField]
-        public float StartDelay;
-        [SerializeField]
-        public float FadeTime;
-        [SerializeField]
-        public float DisplayTime;
-    }
-
     [AddComponentMenu("WorldWeaver/Credits")]
     public class WeaverCredits : MonoBehaviour
     {
         [SerializeField]
-        private Pane[] panes;
+        private Pane[] panes = Array.Empty<Pane>();
 
         [Space]
 
@@ -121,6 +104,19 @@ namespace WorldWeaver.Data.MonoBehaviours
 
             labelText.alpha = to;
             nameText.alpha = to;
+        }
+
+        [Serializable]
+        public struct Pane
+        {
+            public LocalisedString Label;
+            public LocalisedString Name;
+
+            [Space]
+
+            public float StartDelay;
+            public float FadeTime;
+            public float DisplayTime;
         }
     }
 }
