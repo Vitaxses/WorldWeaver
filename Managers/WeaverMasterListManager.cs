@@ -62,6 +62,18 @@ public abstract class ListManager<MList, Item> where MList : NamedScriptableObje
 
         Plugin.Instance.StartCoroutine(CoAddToMasterList());
     }
+
+    protected virtual void AddItemsToMasterList(List<Item> itemList)
+    {
+        foreach (var item in itemList)
+        {
+            if (MasterList!.Contains(item))
+                continue;
+
+            MasterList.Add(item);
+            Plugin.Instance.Logger.LogDebug($"Added {item.GetType().Name}: {item.name} to masterlist");
+        }
+    }
     
     protected virtual IEnumerator CoAddToMasterList()
     {
@@ -103,14 +115,7 @@ public abstract class ListManager<MList, Item> where MList : NamedScriptableObje
             mode: Addressables.MergeMode.Union
         );
 
-        foreach (var item in itemList)
-        {
-            if (MasterList!.Contains(item))
-                continue;
-
-            MasterList.Add(item);
-            Plugin.Instance.Logger.LogDebug($"Added {item.GetType().Name}: {item.name} to masterlist");
-        }
+        AddItemsToMasterList(itemList);
 
         Items = null;
         AddingItemsToMasterList = false;
@@ -125,6 +130,14 @@ public class CollectableItemListManager : ListManager<CollectableItemList, Colle
 public class QuestListManager : ListManager<QuestList, BasicQuestBase>
 {
     public override QuestList? MasterList => QuestManager.Instance.masterList;
+
+    protected override void AddItemsToMasterList(List<BasicQuestBase> itemList)
+    {
+        base.AddItemsToMasterList(itemList);
+        
+        foreach (var quest in itemList)
+            quest.Init();
+    }
 }
 
 public class ToolItemListManager : ListManager<ToolItemList, ToolItem>

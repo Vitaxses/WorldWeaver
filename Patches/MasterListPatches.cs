@@ -5,9 +5,9 @@ namespace WorldWeaver.Patches;
 [HarmonyPatch("Awake")]
 public static class MasterListsPatch
 {
-    [HarmonyPatch(typeof(QuestManager))]
+    [HarmonyPatch(typeof(QuestManager), nameof(QuestManager.Start))]
     [HarmonyPostfix]
-    static void Awake(QuestManager __instance) => WeaverMasterLists.QuestList.AddToMasterList();
+    static void Start(QuestManager __instance) => WeaverMasterLists.QuestList.AddToMasterList();
     
     [HarmonyPatch(typeof(MateriumItemManager), nameof(MateriumItemManager.Start))]
     [HarmonyPostfix]
