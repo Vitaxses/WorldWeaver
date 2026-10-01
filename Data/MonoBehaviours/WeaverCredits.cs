@@ -1,29 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using GlobalEnums;
 using TeamCherry.Localization;
-using UnityEngine;
 
 namespace WorldWeaver.Data.MonoBehaviours
 {
-    [System.Serializable]
-    public class Pane
-    {
-        [SerializeField]
-        public LocalisedString Label;
-        [SerializeField]
-        public LocalisedString Name;
-
-        [Space]
-
-        [SerializeField]
-        public float StartDelay;
-        [SerializeField]
-        public float FadeTime;
-        [SerializeField]
-        public float DisplayTime;
-    }
-    
     public class WeaverCredits : MonoBehaviour
     {
         [SerializeField]
@@ -122,82 +102,18 @@ namespace WorldWeaver.Data.MonoBehaviours
             labelText.alpha = to;
             nameText.alpha = to;
         }
+
+        [Serializable]
+        public struct Pane
+        {
+            public LocalisedString Label;
+            public LocalisedString Name;
+
+            [Space]
+
+            public float StartDelay;
+            public float FadeTime;
+            public float DisplayTime;
+        }
     }
 }
-
-/*panes:
-  - Label:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: TUTORIAL_CREDIT_MOD
-    Name:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: TUTORIAL_CREDIT_NAME_01
-    StartDelay: 2
-    FadeTime: 1
-    DisplayTime: 2
-  - Label:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: 
-    Name:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: TUTORIAL_CREDIT_NAME_02
-    StartDelay: 0.5
-    FadeTime: 1
-    DisplayTime: 2
-  - Label:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: 
-    Name:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: TUTORIAL_CREDIT_NAME_03
-    StartDelay: 0.5
-    FadeTime: 1
-    DisplayTime: 2
-  - Label:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: 
-    Name:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: TUTORIAL_CREDIT_NAME_04
-    StartDelay: 0.5
-    FadeTime: 1
-    DisplayTime: 2
-  - Label:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: TUTORIAL_CREDIT_ART_01
-    Name:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: TUTORIAL_CREDIT_ART_NAME_01
-    StartDelay: 1.5
-    FadeTime: 1
-    DisplayTime: 2
-  - Label:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: 
-    Name:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: TUTORIAL_CREDIT_ART_NAME_02
-    StartDelay: 0.5
-    FadeTime: 1
-    DisplayTime: 2
-  - Label:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: 
-    Name:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: TUTORIAL_CREDIT_ART_NAME_03
-    StartDelay: 0.5
-    FadeTime: 1
-    DisplayTime: 2
-  - Label:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: TUTORIAL_CREDIT_SCORE
-    Name:
-      Sheet: Mods.io.github.jeceratops.silksoul
-      Key: CREDITS_SCORE_NAME_01
-    StartDelay: 1.5
-    FadeTime: 1
-    DisplayTime: 2
-  labelText: {fileID: 1430437130}
-  nameText: {fileID: 698569530}
-  dontDestroyOnLoad: 1*/
