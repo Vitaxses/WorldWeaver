@@ -117,7 +117,7 @@ public abstract class ListManager<MList, Item> where MList : NamedScriptableObje
 
         AddItemsToMasterList(itemList);
 
-        Items = null;
+        //Items = null;
         AddingItemsToMasterList = false;
     }
 }
