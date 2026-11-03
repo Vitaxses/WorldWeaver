@@ -33,6 +33,7 @@ using static CheatManager;
 
 namespace WorldWeaver.Data.MonoBehaviours
 {
+    [AddComponentMenu("")]
     public class CheatManagerUI : MonoBehaviour
     {
         private MenuStates menuState = MenuStates.Main;
@@ -384,13 +385,13 @@ namespace WorldWeaver.Data.MonoBehaviours
             if (Button($"Type: {pdVariableType}", 12) && pdVariableType++ > PlayerDataVariableType.Bool)
                 pdVariableType = 0;
 
-            if (string.IsNullOrEmpty(pdVariableName) || string.IsNullOrEmpty(pdVariableValue))
+            if (string.IsNullOrEmpty(pdVariableName))
             {
                 BackButton(14);
                 return;
             }
 
-            if (Button("Set Variable", 13))
+            if (!string.IsNullOrEmpty(pdVariableValue) && Button("Set Variable", 13))
                 SetPlayerDataVariable();
 
             if (Button("Get Variable", 14))

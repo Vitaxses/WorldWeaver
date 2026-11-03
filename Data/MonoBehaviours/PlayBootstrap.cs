@@ -9,6 +9,7 @@ using static GlobalEnums.GatePosition;
 
 namespace WorldWeaver.Data.MonoBehaviours
 {
+    [AddComponentMenu("")]
     public class PlayBootstrap : MonoBehaviour
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -227,7 +228,7 @@ namespace WorldWeaver.Data.MonoBehaviours
                 return name;
             }
 
-            Debug.LogError($"[PlayBootstrap] Could not find ground point below {position}.");
+            Debug.LogError($"[PlayBootstrap] Could not find ground point below transition: {gate.name} ({position}).");
             return string.Empty;
         }
 
